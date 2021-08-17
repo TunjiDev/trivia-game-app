@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
 
-const globalErrorHandler = require('./src/controllers/errorController');
-const AppError = require('./utils/appError');
+const globalErrorHandler = require('./src/error/errorController');
+const AppError = require('./src/error/appError');
 const userRouter = require('./src/routes/userRoutes');
 
 //Start express app
