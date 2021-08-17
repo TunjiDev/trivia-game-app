@@ -1,3 +1,3 @@
-// exports.checkUser = (req, res) => {
-//     res.send('App Works');
-// };
+exports.checkUser = (req, res) => {
+    res.send('Just some placeholder for now');
+};
