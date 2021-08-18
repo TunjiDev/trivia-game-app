@@ -54,7 +54,7 @@ app.use(xss());
 //Compress all the texts that is sent to clients
 app.use(compression());
 
-app.use('/', userRouter);
+app.use('/api/v1/user', userRouter);
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

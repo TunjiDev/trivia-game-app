@@ -4,6 +4,9 @@ const userSchema = mongoose.Schema({
   phone: {
     type: String,
     required: true,
+    unique: [true, "Cannot create with multiple Phone"],
+    minLength:[14,`Invalid phone number use "+2349012345678" Format`],
+    maxLength:[14,`Invalid phone number use "+2349012345678" Format`],
   },
   verificationCode: { type: String },
   username: { type: String },
