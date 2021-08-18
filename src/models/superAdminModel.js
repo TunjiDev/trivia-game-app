@@ -51,12 +51,12 @@ superAdminSchema.pre('save', async function(next) {
 });
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
+
 userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
-
 const SuperAdmin = mongoose.model('SuperAdmin', superAdminSchema);
 module.exports = SuperAdmin;

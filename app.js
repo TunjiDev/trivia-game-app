@@ -12,6 +12,7 @@ const cors = require('cors');
 const globalErrorHandler = require('./src/error/errorController');
 const AppError = require('./src/error/appError');
 const userRouter = require('./src/routes/userRoutes');
+const adminRouter = require('./src/routes/adminRoutes');
 
 //Start express app
 const app = express();
@@ -55,8 +56,9 @@ app.use(xss());
 app.use(compression());
 
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/superadmin', adminRouter);
 
-app.all('*', (req, res, next) => {
+app.use('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
