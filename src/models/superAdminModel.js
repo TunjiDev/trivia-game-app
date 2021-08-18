@@ -6,7 +6,8 @@ const superAdminSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Please provide a name!'],
-        unique: true
+        unique: true,
+        lowercase: true
     },
     email: {
         type: String,
@@ -51,7 +52,7 @@ superAdminSchema.pre('save', async function(next) {
 });
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
-userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
+superAdminSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
