@@ -1,9 +1,8 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 
-const SuperAdmin = require('./../models/superAdminModel');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
+const catchAsync = require('../../utils/catchAsync');
+const AppError = require('../error/appError');
 
 exports.createSendToken = (user, message, statusCode, req, res) => {
   const token = signToken(user._id);
