@@ -7,7 +7,7 @@
     "start": "node server.js",
     "debug": "ndb server.js",
     "dev": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js",
+    "prod": "NODE_ENV=production nodemon server.js",
     "kill": "sudo pkill -f node",
     "deploy:heroku": "git push heroku main"
   },
