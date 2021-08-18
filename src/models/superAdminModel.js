@@ -52,7 +52,7 @@ superAdminSchema.pre('save', async function(next) {
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
 
-userSchema.methods.correctPassword = async function(
+superAdminSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
 ) {
