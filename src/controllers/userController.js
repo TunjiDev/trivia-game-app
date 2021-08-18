@@ -3,6 +3,7 @@ const AppError = require('../error/appError');
 const User = require('../models/userModel');
 const sendSms = require('../../utils/sendSms');
 const crypto = require('crypto');
+const authController = require('../controllers/authController');
 
 const generateOTP = function() {
   // 1.) generate random 4 digit statusCode
@@ -42,5 +43,20 @@ exports.createUser = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyUser = catchAsync(async (req, res, next) => {
-  // 1
+  const { code } = req.body;
+  // hashing
+  const verificationCode = crypto
+    .createHash('md5')
+    .update(`${code}`)
+    .digest('hex');
+
+  const user = await User.findOne({ verificationCode });
+
+  if (!user)
+    return next(new AppError('Unable to verify user request new code', 400));
+
+  user.isVerified = true;
+  await user.save({ validateBeforeSave: false });
+
+  authController.createSendToken(user, 'Successfully verified', 200, req, res);
 });
