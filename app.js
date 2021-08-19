@@ -8,12 +8,12 @@ const xss = require('xss-clean');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 
 const globalErrorHandler = require('./src/error/errorController');
 const AppError = require('./src/error/appError');
 const userRouter = require('./src/routes/userRoutes');
 const adminRouter = require('./src/routes/adminRoutes');
+const homeRouter = require('./src/routes/homeRouter');
 
 //Start express app
 const app = express();
@@ -56,6 +56,7 @@ app.use(xss());
 //Compress all the texts that is sent to clients
 app.use(compression());
 
+app.use('/', homeRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/superadmin', adminRouter);
 
