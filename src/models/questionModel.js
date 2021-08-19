@@ -9,5 +9,9 @@ const questionSchema = new mongoose.Schema({
         type: String,
         default: 'football'
     },
-    options: {}
+    options: {},
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    }
 });

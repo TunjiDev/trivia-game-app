@@ -30,14 +30,14 @@ const superAdminSchema = new mongoose.Schema({
         required: [true, 'Please provide a password!'],
         select: false
     },
-    createdAt: {
-      type: Date,
-      default: Date.now()
-    },
     active: {
         type: Boolean,
         default: true,
         select: false
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
     }
 });
 
