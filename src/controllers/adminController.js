@@ -1,6 +1,7 @@
 const SuperAdmin = require('../models/superAdminModel');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
+const authController = require('./authController');
 
 exports.signup = catchAsync(async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -13,7 +14,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         password
     });
 
-    createSendToken(newUser, 201, req, res);
+    authController.createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -32,5 +33,5 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     //3) If everything is ok, send token to client
-    createSendToken(user, 200, req, res);
+    authController.createSendToken(user, 200, req, res);
 });
