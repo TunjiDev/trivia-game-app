@@ -3,41 +3,42 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const superAdminSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please provide a name!'],
-    unique: true
-  },
-  email: {
-    type: String,
-    required: [true, 'Please provide an email!'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email!']
-  },
-  photo: {
-    type: String,
-    default: 'default.jpg'
-  },
-  role: {
-    type: String,
-    enum: ['superadmin'],
-    default: 'superadmin'
-  },
-  password: {
-    type: String,
-    required: [true, 'Please provide a password!'],
-    select: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
-  },
-  active: {
-    type: Boolean,
-    default: true,
-    select: false
-  }
+    name: {
+        type: String,
+        required: [true, 'Please provide a name!'],
+        unique: true,
+        lowercase: true
+    },
+    email: {
+        type: String,
+        required: [true, 'Please provide an email!'],
+        unique: true,
+        lowercase: true,
+        validate: [validator.isEmail, 'Please provide a valid email!']
+    },
+    photo: {
+        type: String,
+        default: 'default.jpg'
+    },
+    role: {
+        type: String,
+        enum: ['superadmin'],
+        default: 'superadmin'
+    },
+    password: {
+        type: String,
+        required: [true, 'Please provide a password!'],
+        select: false
+    },
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    }
 });
 
 //Hashing the password

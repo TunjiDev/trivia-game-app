@@ -11,10 +11,6 @@ const categorySchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
-    createdAt: {
-        type: Date,
-        default: Date.now()
-    },
     active: {
         type: Boolean,
         default: true,
@@ -27,6 +23,10 @@ const categorySchema = new mongoose.Schema({
     playCount: {
         type: Number,
         default: 0
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
     }
 });
 
