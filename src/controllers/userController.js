@@ -72,26 +72,23 @@ exports.verifyUser = catchAsync(async (req, res, next) => {
   }).select('+verificationCode');
 });
 
-exports.updateUser = catchAsync(async (req, res, next) => {
-  req.user.username = req.body.username;
-  if (req.body.username)
-    return next( new AppError('Please input username',400))
-  await req.user.save();
-  res.status(200).json({
-    status: 'success',
-    username
-  });
-});
-
 // AWS update
 const s3 = new aws.S3({
   accessKeyId: process.env.S3_ACCESS_KEY,
   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
   region: process.env.S3_BUCKET_REGION
 });
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images', 400), false);
+  }
+};
 
 const upload = bucketName =>
   multer({
+    fileFilter: multerFilter,
     storage: multerS3({
       s3,
       bucket: bucketName,
@@ -99,22 +96,34 @@ const upload = bucketName =>
         cb(null, { fieldName: file.fieldname });
       },
       key: function(req, file, cb) {
-        cb(null, `image-${Date.now()}.jpeg`);
+        cb(
+          null,
+          `${process.env.NODE_ENV}/image-${req.user.id}-${Date.now()}.jpeg`
+        );
       }
     })
   });
 
 exports.setProfilePic = (req, res, next) => {
-  console.log(req.file)
   const uploadSingle = upload(process.env.BUCKET_NAME).single('profilePicture');
 
   uploadSingle(req, res, async err => {
     if (err)
       return next(new AppError('Couldnt not upload image try again', 500));
 
-    req.user.photoProfile = req.file.location;
-    await req.user.save();
+    if (!req.body.username)
+      return next(new AppError('Please input username', 400));
 
-    next();
+    const user = await User.findById(req.user.id);
+
+    user.profilePicture = req.file.location;
+    user.username = req.body.username;
+    await user.save();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Username and photo has been updated',
+      user
+    });
   });
 };
