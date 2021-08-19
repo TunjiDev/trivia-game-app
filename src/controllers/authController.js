@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
-const User = require('../models/userModel')
+const User = require('../models/userModel');
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -35,6 +35,7 @@ exports.createSendToken = (user, message, statusCode, req, res) => {
 exports.protected = catchAsync(async (req, res, next) => {
   // Get token
   let token;
+ 
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')

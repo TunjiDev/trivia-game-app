@@ -16,7 +16,10 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
-  username: { type: String },
+  username: {
+    unique: true,
+    type: String
+  },
   profilePicture: { type: String },
   role: {
     type: String,

@@ -7,6 +7,9 @@ router.route('/signup').post(userController.createUser);
 router.route('/verify').post(userController.verifyUser);
 
 router.use(authController.protected);
-router.route('/update').post(userController.updateUser);
+
+router
+  .route('/update')
+  .post(userController.setProfilePic);
 
 module.exports = router;
