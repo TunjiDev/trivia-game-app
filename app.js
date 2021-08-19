@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const globalErrorHandler = require('./src/error/errorController');
 const AppError = require('./src/error/appError');
@@ -30,20 +31,20 @@ app.use(helmet());
 
 //Development logging
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+  app.use(morgan('dev'));
 }
 
 //Limit requests from the same API
 const limiter = rateLimit({
-    max: 100, //100 request per hour
-    windowMs: 60 * 60 * 1000, //1 hour in milliseconds
-    message: 'Too many request from this IP, please try again in an hour!'
+  max: 100, //100 request per hour
+  windowMs: 60 * 60 * 1000, //1 hour in milliseconds
+  message: 'Too many request from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
 
 //Body parser. Reading data from the body into req.body
-app.use(express.json({limit: '10kb'}));
-app.use(express.urlencoded({extended: true, limit: '10kb'}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 //Data sanitization against NoSQL query injection
@@ -59,7 +60,7 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/superadmin', adminRouter);
 
 app.use('*', (req, res, next) => {
-    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(globalErrorHandler);

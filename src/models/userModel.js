@@ -1,22 +1,32 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    unique: [true, "Cannot create with multiple Phone"],
-    minLength:[14,`Invalid phone number use "+2349012345678" Format`],
-    maxLength:[14,`Invalid phone number use "+2349012345678" Format`],
+    unique: [true, 'Cannot create with multiple Phone'],
+    minLength: [14, `Invalid phone number use "+2349012345678" Format`],
+    maxLength: [14, `Invalid phone number use "+2349012345678" Format`]
   },
-  verificationCode: { type: String },
-  username: { type: String },
+  verificationCode: {
+    type: String,
+    select: false
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  username: {
+    unique: true,
+    type: String
+  },
   profilePicture: { type: String },
   role: {
     type: String,
-    default: "user",
-  },
+    default: 'user'
+  }
 });
 
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model('user', userSchema);
 
 module.exports = User;
