@@ -11,7 +11,7 @@ module.exports = async function(to, message) {
       to: to,
       from: process.env.TWILO_NUMBER
     })
-    .catch(err => {
+    .catch(_err => {
       throw new AppError(`Could not send message to ${to}, Try Again`, 500);
     });
 

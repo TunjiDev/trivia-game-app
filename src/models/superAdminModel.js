@@ -43,18 +43,21 @@ const superAdminSchema = new mongoose.Schema({
 
 //Hashing the password
 superAdminSchema.pre('save', async function(next) {
-    //Only run this funtion is password was actually modified
-    if (!this.isModified('password')) return next();
+  //Only run this funtion is password was actually modified
+  if (!this.isModified('password')) return next();
 
-    //Hash the password with cost of 12
-    this.password = await bcrypt.hash(this.password, 12);
-    next();
+  //Hash the password with cost of 12
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
-superAdminSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-    return await bcrypt.compare(candidatePassword, userPassword);
-};
 
+superAdminSchema.methods.correctPassword = async function(
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 const SuperAdmin = mongoose.model('SuperAdmin', superAdminSchema);
 module.exports = SuperAdmin;
