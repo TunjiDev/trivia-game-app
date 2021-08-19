@@ -8,6 +8,6 @@ router.route('/verify').post(userController.verifyUser);
 
 router.use(authController.protected);
 // Protect update
-router.route('/update').post(userController.setProfilePic);
+router.route('/update').put(userController.setProfilePic);
 
 module.exports = router;
