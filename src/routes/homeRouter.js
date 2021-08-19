@@ -1,5 +1,5 @@
 const express = require('express');
-const catchAsync = require('../error/catchAsync');
+const catchAsync = require('../../utils/catchAsync');
 
 const router = express.Router();
 
