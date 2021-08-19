@@ -17,7 +17,6 @@ const userSchema = mongoose.Schema({
     default: false
   },
   username: {
-    unique: true,
     type: String
   },
   profilePicture: { type: String },
