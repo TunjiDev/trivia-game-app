@@ -22,6 +22,11 @@ const generateOTP = function() {
   return { hash, code };
 };
 
+exports.getUser = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  res.status(200).json({ user });
+});
+
 exports.createUser = catchAsync(async (req, res, next) => {
   // 1. Get Phone number
   const rawPhone = req.body.phoneNumber.startsWith('+234');
