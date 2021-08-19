@@ -8,7 +8,10 @@ const userSchema = mongoose.Schema({
     minLength: [14, `Invalid phone number use "+2349012345678" Format`],
     maxLength: [14, `Invalid phone number use "+2349012345678" Format`]
   },
-  verificationCode: { type: String },
+  verificationCode: {
+    type: String,
+    select: false
+  },
   isVerified: {
     type: Boolean,
     default: false

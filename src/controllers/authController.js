@@ -3,6 +3,13 @@ const jwt = require('jsonwebtoken');
 
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
+const User = require('../models/userModel')
+
+const signToken = id => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+};
 
 exports.createSendToken = (user, message, statusCode, req, res) => {
   const token = signToken(user._id);
@@ -21,10 +28,7 @@ exports.createSendToken = (user, message, statusCode, req, res) => {
   res.status(statusCode).json({
     status: 'success',
     message,
-    token,
-    data: {
-      user
-    }
+    token
   });
 };
 

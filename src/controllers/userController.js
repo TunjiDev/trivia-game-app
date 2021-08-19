@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 const sendSms = require('../../utils/sendSms');
 const crypto = require('crypto');
 const authController = require('../controllers/authController');
-
+const { promisify } = require('util');
 const generateOTP = function() {
   // 1.) generate random 4 digit statusCode
   const code = Math.floor(Math.random() * 8999 + 1000);
@@ -44,19 +44,29 @@ exports.createUser = catchAsync(async (req, res, next) => {
 
 exports.verifyUser = catchAsync(async (req, res, next) => {
   const { code } = req.body;
-  // hashing
+    // hashing
   const verificationCode = crypto
     .createHash('md5')
     .update(`${code}`)
     .digest('hex');
 
-  const user = await User.findOne({ verificationCode });
-
-  if (!user)
-    return next(new AppError('Unable to verify user request new code', 400));
-
-  user.isVerified = true;
-  await user.save({ validateBeforeSave: false });
-
-  authController.createSendToken(user, 'Successfully verified', 200, req, res);
+  User.findOne({ verificationCode }, async (err, user) => {
+    if (err) {
+      return next(new AppError('Unable to verify user request new code', 500));
+    }
+    
+    user.isVerified = true;
+    await user.save();
+  
+    authController.createSendToken(user, 'Successfully verified', 200, req, res);
+  }).select('+verificationCode');
 });
+
+exports.updateUser = catchAsync(async (req, res, next)=>{
+  const user = await User.findById(req.user.id);
+  const { username} = req.body;
+  res.status(200).json({
+    user,username
+
+  })
+})
