@@ -14,7 +14,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         password
     });
 
-    authController.createSendToken(newUser, 201, req, res);
+    authController.createSendToken(newUser, 'token sent successfully!', 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -33,5 +33,5 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     //3) If everything is ok, send token to client
-    authController.createSendToken(user, 200, req, res);
+    authController.createSendToken(user, 'token sent successfully!', 200, req, res);
 });

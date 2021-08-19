@@ -11,7 +11,7 @@ const signToken = id => {
   });
 };
 
-exports.createSendToken = (user, statusCode, req, res) => {
+exports.createSendToken = (user, message, statusCode, req, res) => {
   const token = signToken(user._id);
 
   res.cookie('jwt', token, {
@@ -25,6 +25,7 @@ exports.createSendToken = (user, statusCode, req, res) => {
 
   res.status(statusCode).json({
       status: 'success',
+      message,
       token,
       data: {
           user
