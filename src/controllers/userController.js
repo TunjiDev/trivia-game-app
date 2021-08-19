@@ -40,10 +40,10 @@ exports.createUser = catchAsync(async (req, res, next) => {
   user.phone = req.body.phoneNumber;
   user.verificationCode = otp.hash;
 
+  await user.save();
   // 4. send OTP
   await sendSms(user.phone, `Your OTP is ${otp.code}`);
   //   5.) After Otp then save to DB
-  await user.save();
 
   res.status(201).json({
     status: 'success',
@@ -59,76 +59,30 @@ exports.verifyUser = catchAsync(async (req, res, next) => {
     .update(`${code}`)
     .digest('hex');
 
-  User.findOne({ verificationCode }, async (err, user) => {
-    if (err) {
-      return next(new AppError('Unable to verify user request new code', 500));
-    }
+  const user = await User.findOneAndUpdate(
+    { verificationCode },
+    { isVerified: true, verificationCode: undefined },
+    { new: true }
+  ).select('+verificationCode');
 
-    user.isVerified = true;
-    await user.save();
+  if (!user) return next(new AppError('Could not verify user, Try Again', 400));
 
-    authController.createSendToken(
-      user,
-      'Successfully verified',
-      200,
-      req,
-      res
-    );
-  }).select('+verificationCode');
+  authController.createSendToken(user, 'Successfully verified', 200, req, res);
 });
 
-// AWS update
-const s3 = new aws.S3({
-  accessKeyId: process.env.S3_ACCESS_KEY,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-  region: process.env.S3_BUCKET_REGION
+exports.updateUser = catchAsync(async (req, res, next) => {
+  if (!req.body.username)
+    return next(new AppError('Please input username', 400));
+
+  const user = await User.findById(req.user.id);
+
+  user.username = req.body.username;
+  user.profilePicture = req.body.profilePicture;
+  await user.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Username and photo has been updated',
+    user
+  });
 });
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images', 400), false);
-  }
-};
-
-const upload = bucketName =>
-  multer({
-    fileFilter: multerFilter,
-    storage: multerS3({
-      s3,
-      bucket: bucketName,
-      metadata: function(req, file, cb) {
-        cb(null, { fieldName: file.fieldname });
-      },
-      key: function(req, file, cb) {
-        cb(
-          null,
-          `${process.env.NODE_ENV}/image-${req.user.id}-${Date.now()}.jpeg`
-        );
-      }
-    })
-  });
-
-exports.setProfilePic = (req, res, next) => {
-  const uploadSingle = upload(process.env.BUCKET_NAME).single('profilePicture');
-
-  uploadSingle(req, res, async err => {
-    if (err)
-      return next(new AppError('Couldnt not upload image try again', 500));
-
-    if (!req.body.username)
-      return next(new AppError('Please input username', 400));
-
-    const user = await User.findById(req.user.id);
-
-    user.profilePicture = req.file.location;
-    user.username = req.body.username;
-    await user.save();
-
-    res.status(200).json({
-      status: 'success',
-      message: 'Username and photo has been updated',
-      user
-    });
-  });
-};
