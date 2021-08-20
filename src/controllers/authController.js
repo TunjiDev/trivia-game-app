@@ -15,33 +15,55 @@ exports.createSendToken = (user, message, statusCode, req, res) => {
   const token = signToken(user._id);
 
   res.cookie('jwt', token, {
-      expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   });
 
   //Remove passsword from the output of signing up a new user.
-  user.password = undefined; 
+  user.password = undefined;
 
   res.status(statusCode).json({
-      status: 'success',
-      message,
-      token,
-      data: {
-          user
-      }
+    status: 'success',
+    message,
+    token,
+    data: {
+      user
+    }
   });
 };
 
+exports.createLoginCookie = (user, message, statusCode, req, res) => {
+  const token = signToken(user._id);
+
+  res.cookie('accessToken', token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+  });
+
+  res.status(statusCode).json({
+    status: 'success',
+    message
+  });
+};
 exports.protected = catchAsync(async (req, res, next) => {
   // Get token
   let token;
- 
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (req.cookies.accessToken) {
+    token = req.cookies.accessToken;
   }
 
   if (!token)
@@ -72,3 +94,15 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+// Logout
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('accessToken', '', {
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+  });
+
+  res
+    .status(200)
+    .json({ status: 'message', message: 'Logged out successfully' });
+});

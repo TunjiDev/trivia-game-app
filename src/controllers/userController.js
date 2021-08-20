@@ -4,10 +4,6 @@ const User = require('../models/userModel');
 const sendSms = require('../../utils/sendSms');
 const crypto = require('crypto');
 const authController = require('../controllers/authController');
-const { promisify } = require('util');
-var aws = require('aws-sdk');
-var multer = require('multer');
-var multerS3 = require('multer-s3');
 
 const generateOTP = function() {
   // 1.) generate random 4 digit statusCode
@@ -34,21 +30,34 @@ exports.createUser = catchAsync(async (req, res, next) => {
   if (!rawPhone)
     return next(new AppError('Only +234 code for Nigeria is acceptable', 400));
 
-  // 3. create user with number
+  const userExist = await User.findOne({ phone: req.body.phoneNumber });
+
   const otp = generateOTP();
-  const user = new User();
-  user.phone = req.body.phoneNumber;
-  user.verificationCode = otp.hash;
 
-  await user.save();
-  // 4. send OTP
-  await sendSms(user.phone, `Your OTP is ${otp.code}`);
-  //   5.) After Otp then save to DB
+  // If user already exists send OTP to login
+  if (userExist) {
+    userExist.isVerified = false;
+    userExist.verificationCode = otp.hash;
+    await userExist.save();
+    await sendSms(req.body.phoneNumber, `Your OTP is ${otp.code}`);
 
-  res.status(201).json({
-    status: 'success',
-    message: 'OTP has been sent, Verify to proceed'
-  });
+    res.status(201).json({
+      status: 'success',
+      message: 'OTP has been sent, Verify to proceed'
+    });
+  } else {
+    // 3. create user with number
+    const user = new User();
+    user.phone = req.body.phoneNumber;
+    user.verificationCode = otp.hash;
+    await user.save();
+    await sendSms(user.phone, `Your OTP is ${otp.code}`);
+
+    res.status(201).json({
+      status: 'success',
+      message: 'OTP has been sent, Verify to proceed'
+    });
+  }
 });
 
 exports.verifyUser = catchAsync(async (req, res, next) => {
@@ -67,7 +76,13 @@ exports.verifyUser = catchAsync(async (req, res, next) => {
 
   if (!user) return next(new AppError('Could not verify user, Try Again', 400));
 
-  authController.createSendToken(user, 'Successfully verified', 200, req, res);
+  authController.createLoginCookie(
+    user,
+    'Successfully verified',
+    200,
+    req,
+    res
+  );
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
@@ -90,5 +105,9 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 exports.deleteUser = catchAsync(async (req, res, _next) => {
   const _user = await User.findByIdAndDelete(req.user.id);
 
-  res.status(204)
+  res.status(200).json({
+    status: 'success',
+    message: 'Successful Deleted Record'
+  });
 });
+
