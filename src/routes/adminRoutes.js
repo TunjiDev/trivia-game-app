@@ -9,19 +9,26 @@ router.post('/signup', adminController.signup);
 router.post('/login', adminController.login);
 
 //CATEGORIES
-router.get('/category/:id', categoryController.getCategory);
-router.patch('/category/:id', categoryController.updateCategory);
-router.delete('/category/:id', categoryController.deleteCategory);
+router.use(adminController.protected);
 
-router.get('/category', categoryController.getAllCategories);
-router.post('/category', categoryController.createCategory);
+router.route('/category/:id')
+    .get(categoryController.getCategory)
+    .patch(categoryController.updateCategory)
+    .delete(categoryController.deleteCategory);
+
+router.route('/category')
+    .get(categoryController.getAllCategories)
+    .post(categoryController.createCategory);
 
 //QUESTIONS
-router.get('/question/:id', questionController.getQuestion);
-router.patch('/question/:id', questionController.updateQuestion);
-router.delete('/question/:id', questionController.deleteQuestion);
 
-router.get('/question', questionController.getAllQuestions);
-router.post('/question', questionController.createQuestion);
+router.route('/question/:id')
+    .get(questionController.getQuestion)
+    .patch(questionController.updateQuestion)
+    .delete(questionController.deleteQuestion);
+
+router.route('/question')
+    .get(questionController.getAllQuestions)
+    .post(questionController.createQuestion);
 
 module.exports = router;
