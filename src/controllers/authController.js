@@ -48,6 +48,7 @@ exports.createLoginCookie = (user, message, statusCode, req, res) => {
 
   res.status(statusCode).json({
     status: 'success',
+    token,
     message
   });
 };
