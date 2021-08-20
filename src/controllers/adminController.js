@@ -1,7 +1,11 @@
+const { promisify } = require('util');
+const jwt = require('jsonwebtoken');
+
 const SuperAdmin = require('../models/superAdminModel');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
 const authController = require('./authController');
+const Admin = require('../models/superAdminModel');
 
 exports.signup = catchAsync(async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -34,4 +38,30 @@ exports.login = catchAsync(async (req, res, next) => {
 
     //3) If everything is ok, send token to client
     authController.createSendToken(user, 'token sent successfully!', 200, req, res);
+});
+
+exports.protected = catchAsync(async (req, res, next) => {
+    // Get token
+    let token;
+   
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+  
+    if (!token)
+      return next(
+        new AppError('You are not Logged in, Login to get access', 401)
+      );
+    // Verify token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const freshAdmin = await Admin.findById(decoded.id);
+    if (!freshAdmin) {
+      return next(new AppError('The token for this admin does not exist', 401));
+    }
+    // GRANT ACCESS TO THE PROTECTED ROUTE
+    req.admin = freshAdmin;
+    next();
 });
