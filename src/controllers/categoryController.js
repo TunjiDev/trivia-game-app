@@ -45,7 +45,7 @@ exports.getCategory = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
-    const category = await Category.findByIdByAndUpdate(req.params.json, req.body, {
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
     });
@@ -57,5 +57,16 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
         data: {
             category
         }
+    });
+});
+
+exports.deleteCategory = catchAsync(async (req, res, next) => {
+    const category = await Category.findByIdAndDelete(req.params.id);
+
+    if (!category) return next(new AppError('No Category found with that ID', 404));
+
+    res.status(204).json({
+        status: 'success',
+        data: null
     });
 });
