@@ -33,7 +33,7 @@ describe('Delete User from Database', () => {
       });
   });
 
-  it('should delete user',async done => {
+  it('should delete user', done => {
     const token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMWY4MTEzODIyYTVhMDAxNmE4NWJjNSIsImlhdCI6MTYyOTQ1NDY2MiwiZXhwIjoxNjM3MjMwNjYyfQ.Gik0nEYnAA9_9K28LiCmbTVjdVQK2B-Xeez3EI328p';
     chai
