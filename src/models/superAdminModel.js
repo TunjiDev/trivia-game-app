@@ -22,13 +22,21 @@ const superAdminSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['superadmin'],
         default: 'superadmin'
     },
     password: {
         type: String,
         required: [true, 'Please provide a password!'],
         select: false
+    },
+    ID: {
+      type: String
+    },
+    userAgent: {
+      type: String
+    },
+    lastSeen: {
+      type: String
     },
     active: {
         type: Boolean,
