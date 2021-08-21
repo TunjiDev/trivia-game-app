@@ -4,7 +4,7 @@ const userSchema = mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    unique: [true, 'Cannot create with multiple Phone'],
+    unique: true,
     minLength: [14, `Invalid phone number use "+2349012345678" Format`],
     maxLength: [14, `Invalid phone number use "+2349012345678" Format`]
   },
@@ -17,7 +17,8 @@ const userSchema = mongoose.Schema({
     default: false
   },
   username: {
-    type: String
+    type: String,
+    unique: true
   },
   profilePicture: { type: String },
   role: {

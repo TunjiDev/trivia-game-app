@@ -33,15 +33,15 @@ describe('Delete User from Database', () => {
       });
   });
 
-  it('should delete user', done => {
-    
-    token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMWY4MTEzODIyYTVhMDAxNmE4NWJjNSIsImlhdCI6MTYyOTQ1NDY2MiwiZXhwIjoxNjM3MjMwNjYyfQ.Gik0nEYnAA9_9K28LiCmbTVjdVQK2B-Xeez3EI328p';
+  it('should delete user',async done => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMWY4MTEzODIyYTVhMDAxNmE4NWJjNSIsImlhdCI6MTYyOTQ1NDY2MiwiZXhwIjoxNjM3MjMwNjYyfQ.Gik0nEYnAA9_9K28LiCmbTVjdVQK2B-Xeez3EI328p';
     chai
       .request(server)
       .delete('/api/v1/user/')
-      .set('Authorization', `Bearer ${token}`)
+      .auth(token, { type: 'bearer' })
       .end((err, res) => {
-        expect(res).to.have.status(204);
+        expect(res).to.have.status(201);
         done();
       });
   });
