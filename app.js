@@ -60,7 +60,7 @@ app.use(compression());
 
 app.use('/', homeRouter);
 app.use('/api/v1/user', userRouter);
-app.use('/api/v1/superadmin', adminRouter);
+app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/category', categoryRouter);
 app.use('/api/v1/question', questionRouter);
 
