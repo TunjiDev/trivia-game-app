@@ -1,11 +1,12 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-dotenv.config();
-const User = require('../../models/userModel');
+dotenv.config({ path: './config.env' });
+// const User = require('../../models/userModel');
+const Question = require('../../models/questionModel');
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-// const DB = 'mongodb://localhost:27017/tours';
+// const DB = process.env.LOCAL_DATABASE;
 
 const connectToDb = async function() {
     try {
@@ -24,12 +25,14 @@ const connectToDb = async function() {
 connectToDb();
 
 //READ JSON FILE
-const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf8'));
+// const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf8'));
+const questions = JSON.parse(fs.readFileSync(`${__dirname}/questions.json`, 'utf8'));
 
 //IMPORT DATA INTO DATABASE
 const importData = async () => {
     try {
-        await User.create(users, {validateBeforeSave: false});
+        // await User.create(users, {validateBeforeSave: false});
+        await Question.create(questions, {validateBeforeSave: false});
         console.log('Data successfully loaded!');
     } catch (error) {
         console.log(error);
@@ -40,7 +43,8 @@ const importData = async () => {
 //DELETE ALL DATA FROM THE COLLECTION
 const deleteData = async () => {
     try {
-        await User.deleteMany();
+        // await User.deleteMany();
+        await Question.deleteMany();
         console.log('Data successfully deleted!');
     } catch (error) {
         console.log(error);

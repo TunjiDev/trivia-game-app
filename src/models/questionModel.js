@@ -7,8 +7,9 @@ const questionSchema = new mongoose.Schema({
         unique: true
     },
     category: {
-        type: String,
-        default: 'football'
+        type: mongoose.Schema.ObjectId,
+        ref: 'Category',
+        required: [true, 'Question must belong to a category']
     },
     options: [
         {
@@ -43,16 +44,26 @@ const questionSchema = new mongoose.Schema({
         default: 0
     },
     submitttedBy: {
-        type: String
+        type: mongoose.Schema.ObjectId,
+        ref: 'Admin',
+        required: [true, 'Question must be created and submitted by someone!']
     },
     approvedBy: {
         type: String
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now()
     }
-});
+}, {timestamps: true});
+
+// questionSchema.pre(/^find/, function(next) {
+//     this.populate({
+//         path: 'category',
+//         select: 'name'
+//     })
+//     .populate({
+//         path: 'submitttedBy',
+//         select: 'name'
+//     });
+//     next();
+// });
 
 const Question = mongoose.model('Question', questionSchema);
 module.exports = Question;

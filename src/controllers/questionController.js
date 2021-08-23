@@ -3,7 +3,25 @@ const APIFeatures = require('../../utils/apiFeatures');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
 
+// exports.setCategoryAdminIds = (req, res, next) => {
+//     //Allow nested routes
+//     if (!req.body.category) req.body.category = req.params.categoryId;
+//     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
+//     next();
+// };
+
 exports.createQuestion = catchAsync(async (req, res, next) => {
+    // const newQuestion = await Question.create({
+    //     question: req.body.question,
+    //     category: req.params.categoryId,
+    //     submitttedBy: req.admin.id,
+    //     options: req.body.options,
+    //     answer: req.body.answer,
+    //     difficulty: req.body.difficulty
+    // });
+    if (!req.body.category) req.body.category = req.params.categoryId;
+    if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
+
     const newQuestion = await Question.create(req.body);
 
     res.status(201).json({
@@ -15,7 +33,10 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllQuestions = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Question.find(), req.query)
+    let filter = {};
+    if (req.params.categoryId) filter = {category: req.params.categoryId};
+
+    const features = new APIFeatures(Question.find(filter), req.query)
         .filter()
         .sort()
         .paginate();
@@ -32,7 +53,9 @@ exports.getAllQuestions = catchAsync(async (req, res, next) => {
 });
 
 exports.getQuestion = catchAsync(async (req, res, next) => {
-    const question = await Question.findById(req.params.id);
+    const question = await Question.findById(req.params.id)
+        .populate({path: 'category', select: 'name'})
+        .populate({path: 'submitttedBy', select: 'name'});
 
     if (!question) return next(new AppError('No Question found with that ID', 404));
 
