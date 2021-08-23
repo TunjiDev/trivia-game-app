@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const superAdminSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Please provide a name!'],
@@ -42,15 +42,11 @@ const superAdminSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now()
     }
-});
+}, {timestamps: true});
 
 //Hashing the password
-superAdminSchema.pre('save', async function(next) {
+adminSchema.pre('save', async function(next) {
   //Only run this funtion is password was actually modified
   if (!this.isModified('password')) return next();
 
@@ -61,11 +57,11 @@ superAdminSchema.pre('save', async function(next) {
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
 
-superAdminSchema.methods.correctPassword = async function(
+adminSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
-const SuperAdmin = mongoose.model('SuperAdmin', superAdminSchema);
-module.exports = SuperAdmin;
+const Admin = mongoose.model('Admin', adminSchema);
+module.exports = Admin;

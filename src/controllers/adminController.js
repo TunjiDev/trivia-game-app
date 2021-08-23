@@ -1,18 +1,17 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 
-const SuperAdmin = require('../models/superAdminModel');
+const Admin = require('../models/adminModel');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
 const authController = require('./authController');
-const Admin = require('../models/superAdminModel');
 
 exports.signup = catchAsync(async (req, res, next) => {
     const { name, email, password } = req.body;
 
     if (email != 'winnerakako09@gmail.com') return next(new AppError('You are not authorized to access this route!', 401));
 
-    const newUser = await SuperAdmin.create({
+    const newUser = await Admin.create({
         name,
         email,
         password
@@ -30,7 +29,7 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     //2) Check if user exists && password is correct
-    const user = await SuperAdmin.findOne({email}).select('+password');
+    const user = await Admin.findOne({email}).select('+password');
 
     if (!user || !(await user.correctPassword(password, user.password))) {
         return next(new AppError('Incorrect email or password', 401));

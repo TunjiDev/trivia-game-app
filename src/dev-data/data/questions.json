@@ -1,0 +1,66 @@
+[
+    {
+        "question": "Which of one these english teams have the highest champions league win?",
+        "options": [
+            {
+                "optionA": "Manchester United",
+                "optionB": "Liverpool",
+                "optionC": "Chelsea"
+            }
+        ],
+        "answer": "Liverpool",
+        "difficulty": "easy"
+    },
+    {
+        "question": "What team does Iheanacho for?",
+        "category": "football",
+        "options": [
+            {
+                "optionA": "Real Madrid",
+                "optionB": "Arsenal",
+                "optionC": "Leicester City"
+            }
+        ],
+        "answer": "Leicester City",
+        "difficulty": "average"
+    },
+    {
+        "question": "What is the name of the main protagonist of the series 'The 100'?",
+        "category": "movies",
+        "options": [
+            {
+                "optionA": "Bellamy",
+                "optionB": "Clarke Griffin",
+                "optionC": "Octavia"
+            }
+        ],
+        "answer": "Clarke Griffin",
+        "difficulty": "easy"
+    },
+    {
+        "question": "In what episode of fairytail does natsu dragneel defeat the twin dragons?",
+        "category": "animes",
+        "options": [
+            {
+                "optionA": "Episode 50",
+                "optionB": "Episode 75",
+                "optionC": "Episode 175"
+            }
+        ],
+        "answer": "Episode 175",
+        "difficulty": "hard"
+    },
+    {
+        "question": "Which one of these is not a primary color?",
+        "category": "education",
+        "options": [
+            {
+                "optionA": "Black",
+                "optionB": "Red",
+                "optionC": "Yellow"
+            }
+        ],
+        "answer": "Black",
+        "difficulty": "easy"
+    }
+]

@@ -9,7 +9,8 @@ const categorySchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
+        ref: 'Admin',
+        required: [true, 'Category must be created by someone!']
     },
     active: {
         type: Boolean,
@@ -23,11 +24,15 @@ const categorySchema = new mongoose.Schema({
     playCount: {
         type: Number,
         default: 0
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now()
     }
+}, {timestamps: true});
+
+categorySchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'createdBy',
+        select: 'name'
+    });
+    next();
 });
 
 const Category = mongoose.model('Category', categorySchema);

@@ -4,7 +4,12 @@ const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
 
 exports.createCategory = catchAsync(async (req, res, next) => {
-    const newCategory = await Category.create(req.body);
+    if (!req.body.createdBy) req.body.createdBy = req.admin.id;
+
+    const newCategory = await Category.create({
+        name: req.body.name,
+        createdBy: req.admin.id
+    });
 
     res.status(201).json({
         status: 'success',
