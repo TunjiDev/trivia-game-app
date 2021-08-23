@@ -4,7 +4,6 @@ const userSchema = mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    unique: true,
     minLength: [14, `Invalid phone number use "+2349012345678" Format`],
     maxLength: [14, `Invalid phone number use "+2349012345678" Format`]
   },
@@ -17,8 +16,7 @@ const userSchema = mongoose.Schema({
     default: false
   },
   username: {
-    type: String,
-    unique: true
+    type: String
   },
   profilePicture: { type: String },
   role: {
