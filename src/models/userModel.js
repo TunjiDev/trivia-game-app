@@ -16,13 +16,18 @@ const userSchema = mongoose.Schema({
     default: false
   },
   username: {
-    type: String
+
+    type: String,
+    unique: true,
+
   },
   profilePicture: { type: String },
   role: {
     type: String,
     default: 'user'
-  }
+  },
+  createdAt: Date,
+  verfiedAt: Date
 });
 
 const User = mongoose.model('user', userSchema);
