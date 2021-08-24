@@ -56,7 +56,6 @@ adminSchema.pre('save', async function(next) {
 });
 
 //FOR LOGGING IN: Checking if the inputted password matches that in the database
-
 adminSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
