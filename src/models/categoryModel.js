@@ -24,7 +24,13 @@ const categorySchema = new mongoose.Schema({
     playCount: {
         type: Number,
         default: 0
-    }
+    },
+    questions: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Question'
+        }
+    ]
 }, {timestamps: true});
 
 categorySchema.pre(/^find/, function(next) {

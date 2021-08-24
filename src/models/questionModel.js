@@ -65,5 +65,7 @@ const questionSchema = new mongoose.Schema({
 //     next();
 // });
 
+questionSchema.index({difficulty: 1});
+
 const Question = mongoose.model('Question', questionSchema);
 module.exports = Question;

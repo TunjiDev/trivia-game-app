@@ -45,6 +45,8 @@ const adminSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
+adminSchema.index({name: 1, email: 1}, {unique: true});
+
 //Hashing the password
 adminSchema.pre('save', async function(next) {
   //Only run this funtion is password was actually modified
