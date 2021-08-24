@@ -8,7 +8,7 @@ router.use(adminController.protected);
 //QUESTIONS
 router.route('/:id')
     .get(questionController.getQuestion)
-    .patch(questionController.updateQuestion)
+    .put(questionController.updateQuestion)
     .delete(questionController.deleteQuestion);
 
 router.route('/')
