@@ -44,7 +44,7 @@ categorySchema.pre(/^find/, function(next) {
 // categorySchema.pre(/^find/, function(next) {
 //     this.populate({
 //         path: 'questions',
-//         select: '_id'
+//         select: 'question'
 //     });
 //     next();
 // });
