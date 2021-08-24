@@ -2,10 +2,13 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 
 const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
+const APIFeatures = require('../../utils/apiFeatures');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
 const authController = require('./authController');
 
+//SUPERADMIN
 exports.signup = catchAsync(async (req, res, next) => {
     const { name, email, password } = req.body;
 
@@ -63,4 +66,46 @@ exports.protected = catchAsync(async (req, res, next) => {
     // GRANT ACCESS TO THE PROTECTED ROUTE
     req.admin = freshAdmin;
     next();
+});
+
+//USERS
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(User.find(), req.query)
+      .filter()
+      .sort()
+      .paginate();
+
+  const users = await features.query;
+
+  res.status(200).json({
+      status: 'success',
+      results: users.length,
+      data: {
+          users
+      }
+  });
+});
+
+exports.getUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) return next(new AppError('No user found with that ID', 404));
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          user
+      }
+  });
+});
+
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+
+  if (!user) return next(new AppError('No user found with that ID', 404));
+
+  res.status(204).json({
+      status: 'success',
+      data: null
+  });
 });
