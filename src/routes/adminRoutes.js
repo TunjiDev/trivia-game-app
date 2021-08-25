@@ -8,6 +8,15 @@ router.post('/login', adminController.login);
 
 router.use(adminController.protected);
 
+//ADMINS
+router.route('/lesseradmin')
+    .get(adminController.getAllAdmins)
+    .post(adminController.restrictTo('superadmin'), adminController.createAdmin);
+
+router.route('/lesseradmin/:id')
+    .get(adminController.getAdmin)
+    .delete(adminController.restrictTo('superadmin'), adminController.deleteAdmin);
+
 //USERS
 router.route('/user')
     .get(adminController.getAllUsers);
