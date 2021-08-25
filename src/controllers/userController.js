@@ -41,7 +41,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
     await userExist.save();
     await sendSms(req.body.phoneNumber, `Your OTP is ${otp.code}`);
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
       message: 'OTP has been sent, Verify to proceed'
     });
@@ -50,6 +50,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
     const user = new User();
     user.phone = req.body.phoneNumber;
     user.verificationCode = otp.hash;
+    user.createdAt = Date.now();
     await user.save();
     await sendSms(user.phone, `Your OTP is ${otp.code}`);
 
@@ -70,7 +71,7 @@ exports.verifyUser = catchAsync(async (req, res, next) => {
 
   const user = await User.findOneAndUpdate(
     { verificationCode },
-    { isVerified: true, verificationCode: undefined },
+    { isVerified: true, verificationCode: undefined, verfiedAt: Date.now() },
     { new: true }
   ).select('+verificationCode');
 
@@ -110,4 +111,3 @@ exports.deleteUser = catchAsync(async (req, res, _next) => {
     message: 'Successful Deleted Record'
   });
 });
-
