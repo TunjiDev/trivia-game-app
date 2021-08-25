@@ -37,7 +37,7 @@ exports.getAllCategories = catchAsync(async (req, res, next) => {
 });
 
 exports.getCategory = catchAsync(async (req, res, next) => {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(req.params.id).populate('questions');
 
     if (!category) return next(new AppError('No Category found with that ID', 404));
 
