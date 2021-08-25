@@ -68,6 +68,79 @@ exports.protected = catchAsync(async (req, res, next) => {
     next();
 });
 
+// AUTHORIZATION
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.admin.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action!', 403)
+      );
+    }
+    next();
+  };
+};
+
+//ADMINS
+exports.createAdmin = catchAsync(async (req, res, next) => {
+  const newUser = await Admin.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  });
+
+  newUser.role = 'admin';
+
+  await newUser.save();
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          newUser
+      }
+  });
+});
+
+exports.getAllAdmins = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Admin.find(), req.query)
+      .filter()
+      .sort()
+      .paginate();
+
+  const users = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: {
+        users
+    }
+  });
+});
+
+exports.getAdmin = catchAsync(async (req, res, next) => {
+  const user = await Admin.findById(req.params.id);
+
+  if (!user) return next(new AppError('No admin found with that ID', 404));
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          user
+      }
+  });
+});
+
+exports.deleteAdmin = catchAsync(async (req, res, next) => {
+  const user = await Admin.findByIdAndDelete(req.params.id);
+
+  if (!user) return next(new AppError('No admin found with that ID', 404));
+
+  res.status(204).json({
+      status: 'success',
+      data: null
+  });
+});
+
 //USERS
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(User.find(), req.query)
@@ -78,11 +151,11 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await features.query;
 
   res.status(200).json({
-      status: 'success',
-      results: users.length,
-      data: {
-          users
-      }
+    status: 'success',
+    results: users.length,
+    data: {
+        users
+    }
   });
 });
 
