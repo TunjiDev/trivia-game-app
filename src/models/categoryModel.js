@@ -1,44 +1,48 @@
 const mongoose = require('mongoose');
 
-const categorySchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: [true, 'Please provide a name for this category'],
-        unique: true,
-        lowercase: true
+      type: String,
+      required: [true, 'Please provide a name for this category'],
+      unique: true,
+      lowercase: true
     },
     createdBy: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Admin',
-        required: [true, 'Category must be created by someone!']
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Admin',
+      required: [true, 'Category must be created by someone!']
     },
     active: {
-        type: Boolean,
-        default: true,
-        select: false
+      type: Boolean,
+      default: true,
+      select: false
     },
     questionCount: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0
     },
     playCount: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0
     },
     questions: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Question'
-        }
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Question'
+      }
     ]
-}, {timestamps: true});
+  },
+  { timestamps: true , versionKey:false},
+);
 
 categorySchema.pre(/^find/, function(next) {
-    this.populate({
-        path: 'createdBy',
-        select: 'name'
-    });
-    next();
+  this.populate({ path: 'questions' });
+  this.populate({
+    path: 'createdBy',
+    select: 'name'
+  });
+  next();
 });
 
 const Category = mongoose.model('Category', categorySchema);
