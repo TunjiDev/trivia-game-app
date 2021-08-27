@@ -6,10 +6,7 @@ const AppError = require('../error/appError');
 exports.createCategory = catchAsync(async (req, res, next) => {
   if (!req.body.createdBy) req.body.createdBy = req.admin.id;
 
-  const newCategory = await Category.create({
-    name: req.body.name,
-    createdBy: req.admin.id
-  });
+  const newCategory = await Category.create(req.body);
 
   res.status(201).json({
     status: 'success',
@@ -37,12 +34,12 @@ exports.getAllCategories = catchAsync(async (req, res, next) => {
 });
 
 exports.getCategory = catchAsync(async (req, res, next) => {
-  const category = await Category.findById(req.params.id).populate('questions');
+  const category = await Category.findById(req.params.id);
 
   if (!category)
     return next(new AppError('No Category found with that ID', 404));
 
-  category.questionCount = category.questions.length;
+  // category.questionCount = category.questions.length;
 
   res.status(200).json({
     status: 'success',

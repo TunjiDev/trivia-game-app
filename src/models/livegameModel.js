@@ -9,7 +9,6 @@ const livegameSchema = new mongoose.Schema({
     },
     gameTime: {
         type: Date,
-        default: Date.now(),
         required: true
     },
     entryFee: { 
