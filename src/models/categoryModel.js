@@ -36,12 +36,15 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true , versionKey:false},
 );
 
-categorySchema.pre(/^find/, function(next) {
+categorySchema.pre(/^find/,  function(next) {
   this.populate({ path: 'questions' });
   this.populate({
     path: 'createdBy',
     select: 'name'
   });
+
+  this.questionCount = this.questions?.length;
+
   next();
 });
 
