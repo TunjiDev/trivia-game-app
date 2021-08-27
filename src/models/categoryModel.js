@@ -46,12 +46,13 @@ const categorySchema = new mongoose.Schema(
 // });
 
 categorySchema.pre(/^find/,  function(next) {
-  this.populate({
-    path: 'createdBy',
-    select: 'name'
-  });
+  console.log(this.schema.obj.questionCount);
+  // this.populate({
+  //   path: 'createdBy',
+  //   select: 'name'
+  // });
 
-  this.questionCount = this.questions?.length;
+  this.schema.obj.questionCount = this.schema.obj.questions?.length;
 
   next();
 });

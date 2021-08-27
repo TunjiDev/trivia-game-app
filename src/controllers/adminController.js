@@ -176,6 +176,8 @@ exports.getUser = catchAsync(async (req, res, next) => {
 
 //LIVE GAME
 exports.createLiveGame = catchAsync(async (req, res, next) => {
+  if (!req.body.createdBy) req.body.createdBy = req.admin.id;
+  
   const fourEasyQuestions = await Question.aggregate([
     {
       $match: {category: 'new category'},

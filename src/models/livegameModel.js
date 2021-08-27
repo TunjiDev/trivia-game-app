@@ -52,7 +52,8 @@ const livegameSchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.ObjectId,
-        ref: 'Admin'
+        ref: 'Admin',
+        required: [true, 'A Live game must be created by someone']
     }
 }, {timestamps: true});
 
