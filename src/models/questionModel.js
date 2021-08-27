@@ -7,9 +7,8 @@ const questionSchema = new mongoose.Schema({
         unique: true
     },
     category: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Category',
-        required: [true, 'Question must belong to a category']
+        type: String,
+        required: [true, 'Question must belong to a category'],
     },
     options: [
         {

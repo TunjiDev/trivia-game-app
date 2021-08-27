@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 
 const Admin = require('../models/adminModel');
 const User = require('../models/userModel');
+const Livegame = require('../models/livegameModel');
+const Question = require('../models/questionModel');
 const APIFeatures = require('../../utils/apiFeatures');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
@@ -172,13 +174,82 @@ exports.getUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndDelete(req.params.id);
+//LIVE GAME
+exports.createLiveGame = catchAsync(async (req, res, next) => {
+  const fourEasyQuestions = await Question.aggregate([
+    {
+      $match: {category: 'new category'},
+    },
+    {
+      $match: {difficulty: 'easy'}
+    },
+    {
+      $match: {active: true}
+    },
+    {
+      $sample: {size: 4}
+    }
+  ]);
 
-  if (!user) return next(new AppError('No user found with that ID', 404));
+  const threeAverageQuestions = await Question.aggregate([
+    {
+      $match: {category: 'new category'},
+    },
+    {
+      $match: {difficulty: 'average'}
+    },
+    {
+      $match: {active: true}
+    },
+    {
+      $sample: {size: 3}
+    }
+  ]);
 
-  res.status(204).json({
+  const threeHardQuestions = await Question.aggregate([
+    {
+      $match: {category: 'new category'},
+    },
+    {
+      $match: {difficulty: 'hard'}
+    },
+    {
+      $match: {active: true}
+    },
+    {
+      $sample: {size: 3}
+    }
+  ]);
+
+  const mergedResults = [...fourEasyQuestions, ...threeAverageQuestions, ...threeHardQuestions];
+
+    const newLiveGame = await Livegame.create(req.body);
+
+    newLiveGame.questions = mergedResults;
+
+    await newLiveGame.save();
+
+    res.status(200).json({
       status: 'success',
-      data: null
+      data: {
+        newLiveGame
+      }
+  });
+});
+
+exports.getAllLiveGames = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Livegame.find(), req.query)
+      .filter()
+      .sort()
+      .paginate();
+
+  const livegames = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: livegames.length,
+    data: {
+        livegames
+    }
   });
 });

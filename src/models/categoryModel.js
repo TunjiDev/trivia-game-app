@@ -41,13 +41,5 @@ categorySchema.pre(/^find/, function(next) {
     next();
 });
 
-// categorySchema.pre(/^find/, function(next) {
-//     this.populate({
-//         path: 'questions',
-//         select: 'question'
-//     });
-//     next();
-// });
-
 const Category = mongoose.model('Category', categorySchema);
 module.exports = Category;
