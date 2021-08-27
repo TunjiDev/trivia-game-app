@@ -32,18 +32,28 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true , versionKey:false},
 );
 
-categorySchema.pre(/^find/, async function(next) {
-  console.log(this);
-  // this.questionCount = this.questions.length;
-    // const categoriesPromises = this.questions.map(async (id) => await Question.findById(id));
-    // this.questions = await Promise.all(categoriesPromises);
-  // this.populate({ path: 'questions' });
-  // this.populate({
-  //   path: 'createdBy',
-  //   select: 'name'
-  // });
+// categorySchema.pre(/^find/, async function(next) {
+//   console.log(this);
+//   // this.questionCount = this.questions.length;
+//     // const categoriesPromises = this.questions.map(async (id) => await Question.findById(id));
+//     // this.questions = await Promise.all(categoriesPromises);
+//   // this.populate({ path: 'questions' });
+//   // this.populate({
+//   //   path: 'createdBy',
+//   //   select: 'name'
+//   // });
+//   next();
+// });
+
+categorySchema.pre(/^find/,  function(next) {
+  this.populate({
+    path: 'createdBy',
+    select: 'name'
+  });
+
+  this.questionCount = this.questions?.length;
+
   next();
 });
-
 const Category = mongoose.model('Category', categorySchema);
 module.exports = Category;
