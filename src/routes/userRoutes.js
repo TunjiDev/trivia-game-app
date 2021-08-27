@@ -18,6 +18,7 @@ router.route('/update').put(userController.updateUser);
 
 router.route('/questions').get(questionController.getAllQuestions)
 router.route('/questions/categories').get(categoryController.getAllCategories)
+router.route('/questions/categories/:id').get(categoryController.getCategory)
 
 router.route('/logout').get(authController.logout);
 
