@@ -8,9 +8,8 @@ const questionSchema = new mongoose.Schema(
       unique: true
     },
     category: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Category',
-      required: [true, 'Question must belong to a category']
+        type: String,
+        required: [true, 'Question must belong to a category'],
     },
     options: [
       {
@@ -60,17 +59,17 @@ const questionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// questionSchema.pre(/^find/, function(next) {
-//     this.populate({
-//         path: 'category',
-//         select: 'name'
-//     })
-//     .populate({
-//         path: 'submitttedBy',
-//         select: 'name'
-//     });
-//     next();
-// });
+questionSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'category',
+        select: 'name'
+    });
+    this.populate({
+        path: 'submitttedBy',
+        select: 'name'
+    });
+    next();
+});
 
 questionSchema.index({ difficulty: 1 });
 
