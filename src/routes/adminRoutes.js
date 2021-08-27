@@ -8,6 +8,11 @@ router.post('/login', adminController.login);
 
 router.use(adminController.protected);
 
+//LIVEGAME
+router.route('/livegame')
+    .get(adminController.getAllLiveGames)
+    .post(adminController.createLiveGame);
+
 //ADMINS
 router.route('/lesseradmin')
     .get(adminController.getAllAdmins)
@@ -22,7 +27,6 @@ router.route('/user')
     .get(adminController.getAllUsers);
 
 router.route('/user/:id')
-    .get(adminController.getUser)
-    .delete(adminController.deleteUser);
+    .get(adminController.getUser);
 
 module.exports = router;

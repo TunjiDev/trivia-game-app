@@ -6,7 +6,7 @@ const questionRouter = require('./questionRoutes');
 
 //CATEGORIES
 router.use(adminController.protected);
-router.use('/:categoryId/questions', questionRouter);
+router.use('/:categoryName/questions', questionRouter);
 
 router.route('/:id')
     .get(categoryController.getCategory)

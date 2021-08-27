@@ -1,4 +1,5 @@
 const Question = require('../models/questionModel');
+const Category = require('../models/categoryModel');
 const APIFeatures = require('../../utils/apiFeatures');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../error/appError');
@@ -19,10 +20,16 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
     //     answer: req.body.answer,
     //     difficulty: req.body.difficulty
     // });
-    if (!req.body.category) req.body.category = req.params.categoryId;
+    let categoryModel = await Category.find();
+
+    if (!req.body.category) req.body.category = req.params.categoryName;
     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
 
     const newQuestion = await Question.create(req.body);
+
+    // categoryModel.questions = categoryModel.questions.push(newQuestion._id);
+
+    // console.log(categoryModel.questions);
 
     res.status(201).json({
         status: 'success',
@@ -34,7 +41,7 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
 
 exports.getAllQuestions = catchAsync(async (req, res, next) => {
     let filter = {};
-    if (req.params.categoryId) filter = {category: req.params.categoryId};
+    if (req.params.categoryName) filter = {category: req.params.categoryName};
 
     const features = new APIFeatures(Question.find(filter), req.query)
         .filter()
@@ -42,6 +49,9 @@ exports.getAllQuestions = catchAsync(async (req, res, next) => {
         .paginate();
 
     const questions = await features.query;
+
+    // let categoryModel = await Category.find();
+    // console.log(categoryModel._id);
 
     res.status(200).json({
         status: 'success',
