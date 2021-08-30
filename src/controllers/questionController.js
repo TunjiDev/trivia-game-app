@@ -12,24 +12,21 @@ const AppError = require('../error/appError');
 // };
 
 exports.createQuestion = catchAsync(async (req, res, next) => {
-    // const newQuestion = await Question.create({
-    //     question: req.body.question,
-    //     category: req.params.categoryId,
-    //     submitttedBy: req.admin.id,
-    //     options: req.body.options,
-    //     answer: req.body.answer,
-    //     difficulty: req.body.difficulty
-    // });
-    let categoryModel = await Category.find();
-
+    
     if (!req.body.category) req.body.category = req.params.categoryName;
     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
-
+    
     const newQuestion = await Question.create(req.body);
-
+    
+    // let categoryModel = await Category.find();
     // categoryModel.questions = categoryModel.questions.push(newQuestion._id);
 
-    // console.log(categoryModel.questions);
+    // categoryModel[0].questions.push(newQuestion._id);
+
+    // await categoryModel[0].questions.save();
+
+    // console.log(categoryModel[0].questions);
+    // console.log(categoryModel);
 
     res.status(201).json({
         status: 'success',

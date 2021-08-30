@@ -61,10 +61,6 @@ const questionSchema = new mongoose.Schema(
 
 questionSchema.pre(/^find/, function(next) {
     this.populate({
-        path: 'category',
-        select: 'name'
-    });
-    this.populate({
         path: 'submitttedBy',
         select: 'name'
     });

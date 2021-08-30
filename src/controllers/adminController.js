@@ -178,9 +178,21 @@ exports.getUser = catchAsync(async (req, res, next) => {
 exports.createLiveGame = catchAsync(async (req, res, next) => {
   if (!req.body.createdBy) req.body.createdBy = req.admin.id;
   
+  let categoryName;
+
+  const newLiveGame = await Livegame.create({
+    categoryName: req.body.categoryName,
+    gameTime: req.body.gameTime,
+    entryFee: req.body.entryFee,
+    reward: req.body.reward,
+    createdBy: req.body.createdBy
+  });
+
+  categoryName = newLiveGame.categoryName;
+
   const fourEasyQuestions = await Question.aggregate([
     {
-      $match: {category: 'new category'},
+      $match: {category: `${categoryName}`},
     },
     {
       $match: {difficulty: 'easy'}
@@ -195,7 +207,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 
   const threeAverageQuestions = await Question.aggregate([
     {
-      $match: {category: 'new category'},
+      $match: {category: `${categoryName}`},
     },
     {
       $match: {difficulty: 'average'}
@@ -210,7 +222,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 
   const threeHardQuestions = await Question.aggregate([
     {
-      $match: {category: 'new category'},
+      $match: {category: `${categoryName}`},
     },
     {
       $match: {difficulty: 'hard'}
@@ -224,8 +236,6 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
   ]);
 
   const mergedResults = [...fourEasyQuestions, ...threeAverageQuestions, ...threeHardQuestions];
-
-    const newLiveGame = await Livegame.create(req.body);
 
     newLiveGame.questions = mergedResults;
 

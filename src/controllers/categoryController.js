@@ -39,7 +39,7 @@ exports.getCategory = catchAsync(async (req, res, next) => {
   if (!category)
     return next(new AppError('No Category found with that ID', 404));
 
-  category.questionCount = category.questions.length;
+  // category.questionCount = category.questions.length;
 
   res.status(200).json({
     status: 'success',
