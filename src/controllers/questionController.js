@@ -15,24 +15,30 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
     if (!req.body.category) req.body.category = req.params.categoryName;
     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
     
-    const newQuestion = await Question.create(req.body);
-    
+    const categoryNames = await Category.find().distinct('name');
+    // console.log(categoryNames);
+
+    if (!categoryNames.includes(req.body.category)) {
+        return next(new AppError('The category for this question does not exist. Please pick another category.', 400));
+    } else {
+        const newQuestion = await Question.create(req.body);
+        res.status(201).json({
+            status: 'success',
+            data: {
+                question: newQuestion
+            }
+        });
+    }
     // let categoryModel = await Category.find();
     // categoryModel.questions = categoryModel.questions.push(newQuestion._id);
 
-    // categoryModel[0].questions.push(newQuestion._id);
+    // await categoryModel[0].questions.push(newQuestion._id);
 
     // await categoryModel[0].questions.save();
 
     // console.log(categoryModel[0].questions);
     // console.log(categoryModel);
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            question: newQuestion
-        }
-    });
 });
 
 exports.getAllQuestions = catchAsync(async (req, res, next) => {
