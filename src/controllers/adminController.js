@@ -178,21 +178,14 @@ exports.getUser = catchAsync(async (req, res, next) => {
 exports.createLiveGame = catchAsync(async (req, res, next) => {
   if (!req.body.createdBy) req.body.createdBy = req.admin.id;
   
-  let categoryName;
+  let gameTime = Date.parse(req.body.gameTime);
 
-  const newLiveGame = await Livegame.create({
-    categoryName: req.body.categoryName,
-    gameTime: req.body.gameTime,
-    entryFee: req.body.entryFee,
-    reward: req.body.reward,
-    createdBy: req.body.createdBy
-  });
-
-  categoryName = newLiveGame.categoryName;
+  let DateA = Date.parse(new Date()) + 3600000;
+  let futureDateB = Date.parse(new Date()) + 604800000;
 
   const fourEasyQuestions = await Question.aggregate([
     {
-      $match: {category: `${categoryName}`},
+      $match: {category: `${req.body.categoryName}`},
     },
     {
       $match: {difficulty: 'easy'}
@@ -207,7 +200,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 
   const threeAverageQuestions = await Question.aggregate([
     {
-      $match: {category: `${categoryName}`},
+      $match: {category: `${req.body.categoryName}`},
     },
     {
       $match: {difficulty: 'average'}
@@ -222,7 +215,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 
   const threeHardQuestions = await Question.aggregate([
     {
-      $match: {category: `${categoryName}`},
+      $match: {category: `${req.body.categoryName}`},
     },
     {
       $match: {difficulty: 'hard'}
@@ -237,15 +230,35 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 
   const mergedResults = [...fourEasyQuestions, ...threeAverageQuestions, ...threeHardQuestions];
 
-    newLiveGame.questions = mergedResults;
+  let newLiveGame;
 
-    await newLiveGame.save();
+  if(gameTime >= DateA && gameTime < futureDateB) {
+    if (mergedResults.length >= 10) {
+      newLiveGame = await Livegame.create({
+        categoryName: req.body.categoryName,
+        gameTime,
+        entryFee: req.body.entryFee,
+        reward: req.body.reward,
+        createdBy: req.body.createdBy
+      });
+    
+      categoryName = newLiveGame.categoryName;
+    } else { 
+      return next(new AppError('This category either doesn\'t exist or it doesn\'t have enough questions. Please pick another category.', 400));
+    }
+    }else{
+      return next(new AppError('Game time must be at least one hour in the future.', 400));
+    }
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        newLiveGame
-      }
+  newLiveGame.questions = mergedResults;
+
+  await newLiveGame.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      newLiveGame
+    }
   });
 });
 
