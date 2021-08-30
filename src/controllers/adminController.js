@@ -278,3 +278,14 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.deleteLiveGame = catchAsync(async (req, res, next) => {
+  const livegame = await Livegame.findByIdAndDelete(req.params.id);
+
+  if (!livegame) return next(new AppError('No livegame found with that ID', 404));
+
+  res.status(204).json({
+      status: 'success',
+      data: null
+  });
+});
