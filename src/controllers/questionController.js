@@ -12,7 +12,6 @@ const AppError = require('../error/appError');
 // };
 
 exports.createQuestion = catchAsync(async (req, res, next) => {
-    
     if (!req.body.category) req.body.category = req.params.categoryName;
     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
     
@@ -61,7 +60,6 @@ exports.getAllQuestions = catchAsync(async (req, res, next) => {
 
 exports.getQuestion = catchAsync(async (req, res, next) => {
     const question = await Question.findById(req.params.id)
-        .populate({path: 'category', select: 'name'})
         .populate({path: 'submitttedBy', select: 'name'});
 
     if (!question) return next(new AppError('No Question found with that ID', 404));

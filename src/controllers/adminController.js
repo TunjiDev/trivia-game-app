@@ -180,8 +180,8 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
   
   let gameTime = Date.parse(req.body.gameTime);
 
-  let DateA = Date.parse(new Date()) + 3600000;
-  let futureDateB = Date.parse(new Date()) + 604800000;
+  let DateA = Date.parse(new Date()) + 3600000;  //1 hour in the future
+  let futureDateB = Date.parse(new Date()) + 604800000; //7 days in future
 
   const fourEasyQuestions = await Question.aggregate([
     {
@@ -246,7 +246,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
     } else { 
       return next(new AppError('This category either doesn\'t exist or it doesn\'t have enough questions. Please pick another category.', 400));
     }
-    }else{
+    } else{
       return next(new AppError('Game time must be at least one hour in the future.', 400));
     }
 
