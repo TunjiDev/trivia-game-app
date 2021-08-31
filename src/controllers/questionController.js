@@ -16,12 +16,26 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
     if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
     
     const categoryNames = await Category.find().distinct('name');
-    // console.log(categoryNames);
 
     if (!categoryNames.includes(req.body.category)) {
         return next(new AppError('The category for this question does not exist. Please pick another category.', 400));
     } else {
+        // const questionCount = await Question.aggregate([
+        //     {
+        //         $match: {category: `${req.body.category}`}
+        //     },
+        //     {
+        //         $group: {
+        //             _id: null,
+        //             numQuestions: {$sum: 1}
+        //         }
+        //     }
+        // ]);
         const newQuestion = await Question.create(req.body);
+        const allQuestionsInASpecificCategory = await Question.find({category: `${req.body.category}`});
+        console.log(allQuestionsInASpecificCategory.length);
+
+        await Category.findOneAndUpdate({name: `${req.body.category}`}, {questionCount: allQuestionsInASpecificCategory.length}, {runValidators: true});
         res.status(201).json({
             status: 'success',
             data: {
@@ -29,16 +43,6 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
             }
         });
     }
-    // let categoryModel = await Category.find();
-    // categoryModel.questions = categoryModel.questions.push(newQuestion._id);
-
-    // await categoryModel[0].questions.push(newQuestion._id);
-
-    // await categoryModel[0].questions.save();
-
-    // console.log(categoryModel[0].questions);
-    // console.log(categoryModel);
-
 });
 
 exports.getAllQuestions = catchAsync(async (req, res, next) => {
@@ -51,9 +55,6 @@ exports.getAllQuestions = catchAsync(async (req, res, next) => {
         .paginate();
 
     const questions = await features.query;
-
-    // let categoryModel = await Category.find();
-    // console.log(categoryModel._id);
 
     res.status(200).json({
         status: 'success',

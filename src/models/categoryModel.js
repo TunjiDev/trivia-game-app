@@ -26,8 +26,7 @@ const categorySchema = new mongoose.Schema(
     playCount: {
       type: Number,
       default: 0
-    },
-    questions: Array
+    }
   },
   { timestamps: true , versionKey:false},
 );
