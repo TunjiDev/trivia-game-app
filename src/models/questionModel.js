@@ -43,7 +43,7 @@ const questionSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    submitttedBy: {
+    submittedBy: {
       type: mongoose.Schema.ObjectId,
       ref: 'Admin',
       required: [true, 'Question must be created and submitted by someone!']
@@ -61,7 +61,7 @@ const questionSchema = new mongoose.Schema(
 
 questionSchema.pre(/^find/, function(next) {
     this.populate({
-        path: 'submitttedBy',
+        path: 'submittedBy',
         select: 'name'
     });
     next();

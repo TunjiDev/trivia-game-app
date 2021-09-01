@@ -13,7 +13,7 @@ const AppError = require('../error/appError');
 
 exports.createQuestion = catchAsync(async (req, res, next) => {
     if (!req.body.category) req.body.category = req.params.categoryName;
-    if (!req.body.submitttedBy) req.body.submitttedBy = req.admin.id;
+    if (!req.body.submittedBy) req.body.submittedBy = req.admin.id;
     
     const categoryNames = await Category.find().distinct('name');
 
@@ -33,7 +33,7 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
         // ]);
         const newQuestion = await Question.create(req.body);
         const allQuestionsInASpecificCategory = await Question.find({category: `${req.body.category}`});
-        console.log(allQuestionsInASpecificCategory.length);
+        // console.log(allQuestionsInASpecificCategory.length);
 
         await Category.findOneAndUpdate({name: `${req.body.category}`}, {questionCount: allQuestionsInASpecificCategory.length}, {runValidators: true});
         res.status(201).json({
@@ -66,8 +66,7 @@ exports.getAllQuestions = catchAsync(async (req, res, next) => {
 });
 
 exports.getQuestion = catchAsync(async (req, res, next) => {
-    const question = await Question.findById(req.params.id)
-        .populate({path: 'submitttedBy', select: 'name'});
+    const question = await Question.findById(req.params.id);
 
     if (!question) return next(new AppError('No Question found with that ID', 404));
 

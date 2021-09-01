@@ -247,7 +247,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
       return next(new AppError('This category either doesn\'t exist or it doesn\'t have enough questions. Please pick another category.', 400));
     }
     } else{
-      return next(new AppError('Game time must be at least one hour in the future.', 400));
+      return next(new AppError('Game time must be at least one hour in the future and also not above 7 days.', 400));
     }
 
   newLiveGame.questions = mergedResults;
@@ -276,6 +276,35 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
     data: {
         livegames
     }
+  });
+});
+
+exports.getLivegame = catchAsync(async (req, res, next) => {
+  const livegame = await Livegame.findById(req.params.id);
+
+  if (!livegame) return next(new AppError('No Livegame found with that ID', 404));
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          livegame
+      }
+  });
+});
+
+exports.updateLivegame = catchAsync(async (req, res, next) => {
+  const livegame = await Livegame.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+  });
+
+  if (!livegame) return next(new AppError('No Livegame found with that ID', 404));
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          livegame
+      }
   });
 });
 

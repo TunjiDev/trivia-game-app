@@ -14,6 +14,8 @@ router.route('/livegame')
     .post(adminController.createLiveGame);
 
 router.route('/livegame/:id')
+    .get(adminController.getLivegame)
+    .patch(adminController.updateLivegame)
     .delete(adminController.deleteLiveGame);
 
 //ADMINS

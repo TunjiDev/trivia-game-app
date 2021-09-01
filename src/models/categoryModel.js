@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Question = require('./questionModel');
 
 const categorySchema = new mongoose.Schema(
   {
@@ -31,28 +30,11 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true , versionKey:false},
 );
 
-// categorySchema.pre(/^find/, async function(next) {
-//   console.log(this);
-//   // this.questionCount = this.questions.length;
-//     // const categoriesPromises = this.questions.map(async (id) => await Question.findById(id));
-//     // this.questions = await Promise.all(categoriesPromises);
-//   // this.populate({ path: 'questions' });
-//   // this.populate({
-//   //   path: 'createdBy',
-//   //   select: 'name'
-//   // });
-//   next();
-// });
-
 categorySchema.pre(/^find/,  function(next) {
-  // console.log(this.schema.obj.questionCount);
   this.populate({
     path: 'createdBy',
     select: 'name'
   });
-
-  // this.schema.obj.questionCount = this.schema.obj.questions?.length;
-
   next();
 });
 const Category = mongoose.model('Category', categorySchema);
