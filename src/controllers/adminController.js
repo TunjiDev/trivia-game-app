@@ -298,7 +298,6 @@ exports.updateLivegame = catchAsync(async (req, res, next) => {
       runValidators: true
   });
 
-  // if (req.body.gameTime) Date.parse(req.body.gameTime);
   livegame.gameTime = Date.parse(req.body.gameTime);
 
   await livegame.save();
