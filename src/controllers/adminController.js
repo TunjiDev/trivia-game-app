@@ -298,9 +298,10 @@ exports.updateLivegame = catchAsync(async (req, res, next) => {
       runValidators: true
   });
 
-  livegame.gameTime = Date.parse(req.body.gameTime);
-
-  await livegame.save();
+  if (req.body.gameTime) {
+    livegame.gameTime = Date.parse(req.body.gameTime);
+    await livegame.save();
+  }
 
   if (!livegame) return next(new AppError('No Livegame found with that ID', 404));
 
