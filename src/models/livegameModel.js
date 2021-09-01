@@ -4,7 +4,6 @@ const livegameSchema = new mongoose.Schema({
     categoryName: { 
         type: String,
         required: [true, 'A live game must have a category name'],
-        unique: true,
         lowercase: true
     },
     gameTime: {
