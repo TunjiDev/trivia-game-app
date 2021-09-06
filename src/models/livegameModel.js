@@ -14,18 +14,8 @@ const livegameSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    participants: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User'
-        }
-    ],
-    activeParticipants: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User'
-        }
-    ],
+    participants: [],
+    activeParticipants: [],
     questions: Array,
     reward: {
         type: Number,
@@ -61,6 +51,9 @@ livegameSchema.pre(/^find/, function(next) {
         path: 'createdBy',
         select: 'name'
     });
+    // this.populate({
+    //     path: 'participants'
+    // });
     next();
 });
 

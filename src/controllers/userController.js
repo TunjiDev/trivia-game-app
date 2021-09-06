@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const sendSms = require('../../utils/sendSms');
 const crypto = require('crypto');
 const authController = require('../controllers/authController');
+const Livegame = require('../models/livegameModel');
 
 const generateOTP = function() {
   // 1.) generate random 4 digit statusCode
@@ -109,5 +110,35 @@ exports.deleteUser = catchAsync(async (req, res, _next) => {
   res.status(200).json({
     status: 'success',
     message: 'Successful Deleted Record'
+  });
+});
+
+exports.joinLiveGame = catchAsync(async (req, res, next) => {
+  const livegame = await Livegame.findOne({categoryName: req.body.categoryName});
+  
+  // 1) Check if game is active
+  if (!livegame.activeStatus) {
+    return next(new AppError('You can\'t join this game now because it is not yet active!', 400));
+  }
+
+  // 3) Check if a game the user had already joined won't start in 20mins
+  
+  // 2) Check if they have already joined the game
+  if (livegame.participants.includes(req.user.id)) {
+    return next(new AppError('You can\'t join the same game twice!', 400));
+  }
+
+  // 4) Check if they have enough coins to join the game
+  if (req.user.coins < livegame.entryFee) {
+    return next(new AppError('You do not have enough coins to join this game!', 400));
+  }
+  
+  // console.log(req.user.id);
+  livegame.participants.push(req.user.id);
+  await livegame.save();
+  // console.log(livegame.participants);
+  res.status(200).json({
+    status: 'success',
+    message: 'You have successfully joined this live game!'
   });
 });

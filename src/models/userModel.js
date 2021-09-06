@@ -16,19 +16,53 @@ const userSchema = mongoose.Schema({
     default: false
   },
   username: {
-
-    type: String,
-    unique: true,
-
+    type: String
   },
-  profilePicture: { type: String },
+  profilePicture: { 
+    type: String 
+  },
   role: {
     type: String,
     default: 'user'
   },
-  createdAt: Date,
-  verfiedAt: Date
-});
+  verfiedAt: Date,
+  lastSeen: {
+    type: Date,
+    default: Date.now()
+  },
+  coins: {
+    type: Number,
+    default: 0
+  },
+  erasers: {
+    type: Number,
+    default: 0
+  },
+  extraLives: {
+    type: Number,
+    default: 0
+  },
+  earnings: {
+    type: Number,
+    default: 0
+  },
+  bankAccount: {
+    type: Number
+  },
+  bankName: {
+    type: String
+  },
+  activeGame: [
+    {
+      categoryId: {
+        type: String
+      },
+      time: {
+        type: Date
+      }
+    }
+  ]
+}, {timestamps: true});
 
 const User = mongoose.model('user', userSchema);
 

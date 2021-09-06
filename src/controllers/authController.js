@@ -48,8 +48,9 @@ exports.createLoginCookie = (user, message, statusCode, req, res) => {
 
   res.status(statusCode).json({
     status: 'success',
+    message,
     token,
-    message
+    user
   });
 };
 exports.protected = catchAsync(async (req, res, next) => {

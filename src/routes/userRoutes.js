@@ -16,9 +16,12 @@ router
   .delete(userController.deleteUser);
 router.route('/update').put(userController.updateUser);
 
-router.route('/questions').get(questionController.getAllQuestions)
-router.route('/questions/categories').get(categoryController.getAllCategories)
-router.route('/questions/categories/:id').get(categoryController.getCategory)
+router.route('/questions').get(questionController.getAllQuestions);
+router.route('/questions/categories').get(categoryController.getAllCategories);
+router.route('/questions/categories/:id').get(categoryController.getCategory);
+
+router.route('/livegame')
+  .post(userController.joinLiveGame);
 
 router.route('/logout').get(authController.logout);
 
