@@ -5,6 +5,7 @@ const sendSms = require('../../utils/sendSms');
 const crypto = require('crypto');
 const authController = require('../controllers/authController');
 const Livegame = require('../models/livegameModel');
+const APIFeatures = require('../../utils/apiFeatures');
 
 const generateOTP = function() {
   // 1.) generate random 4 digit statusCode
@@ -110,6 +111,23 @@ exports.deleteUser = catchAsync(async (req, res, _next) => {
   res.status(200).json({
     status: 'success',
     message: 'Successful Deleted Record'
+  });
+});
+
+exports.getAllLiveGames = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Livegame.find(), req.query)
+      .filter()
+      .sort()
+      .paginate();
+
+  const livegames = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: livegames.length,
+    data: {
+        livegames
+    }
   });
 });
 

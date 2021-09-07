@@ -21,6 +21,7 @@ router.route('/questions/categories').get(categoryController.getAllCategories);
 router.route('/questions/categories/:id').get(categoryController.getCategory);
 
 router.route('/livegame')
+  .get(userController.getAllLiveGames)
   .post(userController.joinLiveGame);
 
 router.route('/logout').get(authController.logout);
