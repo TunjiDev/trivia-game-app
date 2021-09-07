@@ -32,7 +32,7 @@ const userSchema = mongoose.Schema({
   },
   coins: {
     type: Number,
-    default: 0
+    default: 1000
   },
   erasers: {
     type: Number,
