@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
@@ -32,7 +32,7 @@ const userSchema = mongoose.Schema({
   },
   coins: {
     type: Number,
-    default: 1000
+    default: 50000
   },
   erasers: {
     type: Number,
@@ -52,16 +52,7 @@ const userSchema = mongoose.Schema({
   bankName: {
     type: String
   },
-  activeGame: [
-    {
-      categoryId: {
-        type: String
-      },
-      time: {
-        type: Date
-      }
-    }
-  ]
+  activeGames: []
 }, {timestamps: true});
 
 const User = mongoose.model('user', userSchema);

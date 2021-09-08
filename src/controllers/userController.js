@@ -54,7 +54,6 @@ exports.createUser = catchAsync(async (req, res, next) => {
     const user = new User();
     user.phone = req.body.phoneNumber;
     user.verificationCode = otp.hash;
-    user.createdAt = Date.now();
     await user.save();
     await sendSms(user.phone, `Your OTP is ${otp.code}`);
 
@@ -136,19 +135,41 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
 });
 
 exports.joinLiveGame = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
   const livegame = await Livegame.findOne({categoryName: req.body.categoryName});
+  const twoMinsToGameTime = +livegame.gameTime - 120000;
+  const twentyMinsAfterCurrentTime = Date.parse(new Date()) + 1200000;
+  const currentTime = Date.parse(new Date());
   
-  // 1) Check if game is active
+  // 1) Check if game is active.
   if (!livegame.activeStatus) {
     return next(new AppError('You can\'t join this game now because it is not yet active!', 400));
   }
 
+  // Check if gametime is NOT two minutes or less to the start of the game
+  if (currentTime >= twoMinsToGameTime) {
+    return next(new AppError('The time for joining this game has passed, Please join another live game', 400));
+  }
+
   // 2) Check if they have already joined the game
   if (livegame.participants.includes(req.user.id)) {
-    return next(new AppError('You can\'t join the same game twice!', 400));
+    return next(new AppError('You have already joined this game!', 400));
   }
   
   // 3) Check if a game the user had already joined won't start in 20mins
+  // let activeGametimeArr = [];
+
+  //pushed all gametimes into the new array above
+  // user.activeGames.map((el) => {
+  //   activeGametimeArr.push(el.gameTime);
+  // });
+
+  //Checking if any of the game time is greater than or equal to twentyMinsAfterCurrentTime
+  // const cannotProceed = activeGametimeArr.some((el) => {
+  //   return twentyMinsAfterCurrentTime >= el;
+  // });
+
+  // if (cannotProceed) return next(new AppError('You have a game that will start in 20 minutes!', 400));
 
   // 4) Check if they have enough coins to join the game
   if (req.user.coins < livegame.entryFee) {
@@ -156,15 +177,27 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   }
   
   // 5) Push the user's ID in the game participants
-  livegame.participants.push(req.user.id);
-  await livegame.save();
+  let objectForParticipants = {
+    username: user.username,
+    photo: user.profilePicture
+  };
 
+  livegame.participants.push(objectForParticipants);
+  
   // 6) Insert the game's category ID and game time in the activeGames field of the user's model
+  let objectForActiveGames = {
+    categoryId: livegame._id,
+    gameTime: livegame.gameTime
+  };
 
+  user.activeGames.push(objectForActiveGames);
+  
   // 7) Debit the coin of the user
-  const user = await User.findById(req.user.id);
   user.coins = user.coins - livegame.entryFee;
+  
+  await livegame.save();
   await user.save();
+  console.log(user.activeGames);
 
   res.status(200).json({
     status: 'success',
