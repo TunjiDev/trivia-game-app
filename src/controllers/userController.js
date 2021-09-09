@@ -152,24 +152,27 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   }
 
   // 2) Check if they have already joined the game
-  if (livegame.participants.includes(req.user.id)) {
+  let participantsNamesArr = [];
+  
+  livegame.participants.forEach((el) => {
+    participantsNamesArr.push(el.username);
+  });
+
+  if (participantsNamesArr.includes(req.user.username)) {
     return next(new AppError('You have already joined this game!', 400));
   }
   
   // 3) Check if a game the user had already joined won't start in 20mins
-  // let activeGametimeArr = [];
-
+  let activeGametimeArr = [];
   //pushed all gametimes into the new array above
-  // user.activeGames.map((el) => {
-  //   activeGametimeArr.push(el.gameTime);
-  // });
+  user.activeGames.forEach((el) => {
+    activeGametimeArr.push(el.gameTime);
+  });
 
-  //Checking if any of the game time is greater than or equal to twentyMinsAfterCurrentTime
-  // const cannotProceed = activeGametimeArr.some((el) => {
-  //   return twentyMinsAfterCurrentTime >= el;
-  // });
-
-  // if (cannotProceed) return next(new AppError('You have a game that will start in 20 minutes!', 400));
+  const willStartInTwentyMinsOrLess = activeGametimeArr.some((el) => el >= currentTime && el <= twentyMinsAfterCurrentTime);
+  if (willStartInTwentyMinsOrLess) {
+    return next(new AppError('You have already joined a game that will begin in 20 minutes or less', 400));
+  }
 
   // 4) Check if they have enough coins to join the game
   if (req.user.coins < livegame.entryFee) {
@@ -198,6 +201,9 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   await livegame.save();
   await user.save();
   console.log(user.activeGames);
+  console.log(willStartInTwentyMinsOrLess);
+  console.log(activeGametimeArr);
+  console.log(twentyMinsAfterCurrentTime);
 
   res.status(200).json({
     status: 'success',
