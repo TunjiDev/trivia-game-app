@@ -20,8 +20,7 @@ const generateOTP = function() {
   return { hash, code };
 };
 
-//USER
-
+//========================== USER =============================
 exports.getUser = catchAsync(async (req, res, next) => {
   const user = req.user;
   res.status(200).json({ user });
@@ -115,8 +114,7 @@ exports.deleteUser = catchAsync(async (req, res, _next) => {
   });
 });
 
-//LIVE GAME
-
+//========================== LIVE GAME =============================
 exports.getAllLiveGames = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(Livegame.find(), req.query)
       .filter()
@@ -200,13 +198,59 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   
   await livegame.save();
   await user.save();
-  console.log(user.activeGames);
-  console.log(willStartInTwentyMinsOrLess);
-  console.log(activeGametimeArr);
-  console.log(twentyMinsAfterCurrentTime);
 
   res.status(200).json({
     status: 'success',
     message: 'You have successfully joined this live game!'
   });
+});
+
+//========================== GAME ZONE =============================
+exports.gameZone = catchAsync(async (req, res, next) => {
+  const livegame = await Livegame.findById(req.params.gameId);
+  const user = await User.findById(req.user.id);
+  const currentTime = Date.parse(new Date());
+  const twoMinsToGameTime = +livegame.gameTime - 120000;
+
+  // 1) With the gameId, check if game is active. (Check if time and status is active)
+  if (currentTime >= twoMinsToGameTime && livegame.activeStatus) {
+
+    // 2) Check if user is a participant in the game
+    let participantsNamesArr = [];
+  
+    livegame.participants.forEach((el) => {
+      participantsNamesArr.push(el.username);
+    });
+  
+    if (!participantsNamesArr.includes(req.user.username)) {
+      return next(new AppError('You are not a participant in this game!', 400));
+    }
+
+    // 3) Make the Id of the game the current game Id in the user's model
+    let objectForcurrentGame = {
+      currentGameId: livegame._id,
+      timer: livegame.questionsTimer,
+      eraser: user.erasers,
+      extraLife: user.extraLives,
+      gameStatus: livegame.activeStatus
+    };
+
+    user.currentGame.push(objectForcurrentGame);
+
+    // 4) Set question state(current question) to 0
+    livegame.currentQuestion = 0;
+
+    // 5) Set questions timer to 30 seconds.
+    livegame.questionsTimer = 30;
+
+    await livegame.save();
+    await user.save();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'You have been taken to the game zone.'
+    });
+  } else {
+    return next(new AppError('This game is either not yet active or it is not yet time', 400));
+  }
 });

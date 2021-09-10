@@ -24,6 +24,9 @@ router.route('/livegame')
   .get(userController.getAllLiveGames)
   .post(userController.joinLiveGame);
 
+router.route('/gamezone/:gameId')
+  .get(userController.gameZone);
+
 router.route('/logout').get(authController.logout);
 
 module.exports = router;

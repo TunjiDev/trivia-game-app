@@ -51,9 +51,6 @@ livegameSchema.pre(/^find/, function(next) {
         path: 'createdBy',
         select: 'name'
     });
-    // this.populate({
-    //     path: 'participants'
-    // });
     next();
 });
 

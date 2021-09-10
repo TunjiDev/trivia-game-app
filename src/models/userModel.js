@@ -52,7 +52,8 @@ const userSchema = new mongoose.Schema({
   bankName: {
     type: String
   },
-  activeGames: []
+  activeGames: [], //This would eventually contain an object with the livegame Id and game time
+  currentGame: [] //This would eventually contain an object with the current game Id, questionTimer,  eraser, extralife, gamestatus.
 }, {timestamps: true});
 
 const User = mongoose.model('user', userSchema);
