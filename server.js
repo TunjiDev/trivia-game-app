@@ -47,3 +47,5 @@ process.on("SIGTERM", () => {
   });
 });
 console.log(process.env.NODE_ENV);
+
+module.exports = server; //For testing

@@ -149,14 +149,7 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
     return next(new AppError('The time for joining this game has passed, Please join another live game', 400));
   }
 
-  // 2) Check if they have already joined the game
-  let participantsNamesArr = [];
-  
-  livegame.participants.forEach((el) => {
-    participantsNamesArr.push(el.username);
-  });
-
-  if (participantsNamesArr.includes(req.user.username)) {
+  if (livegame.participants.includes(req.user._id)) {
     return next(new AppError('You have already joined this game!', 400));
   }
   
@@ -178,12 +171,7 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   }
   
   // 5) Push the user's ID in the game participants
-  let objectForParticipants = {
-    username: user.username,
-    photo: user.profilePicture
-  };
-
-  livegame.participants.push(objectForParticipants);
+  livegame.participants.push(req.user._id);
   
   // 6) Insert the game's category ID and game time in the activeGames field of the user's model
   let objectForActiveGames = {
@@ -207,23 +195,25 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
 
 //========================== GAME ZONE =============================
 exports.gameZone = catchAsync(async (req, res, next) => {
-  const livegame = await Livegame.findById(req.params.gameId);
+  const livegame = await Livegame.findById(req.body.gameId);
   const user = await User.findById(req.user.id);
+  const answer = req.body.answer;
+  const action = req.body.action;
   const currentTime = Date.parse(new Date());
   const twoMinsToGameTime = +livegame.gameTime - 120000;
+  const timer = +livegame.gameTime + 30000;
 
   // 1) With the gameId, check if game is active. (Check if time and status is active)
-  if (currentTime >= twoMinsToGameTime && livegame.activeStatus) {
-
+  if (currentTime >= twoMinsToGameTime && livegame.activeStatus && !livegame.gameInit && !livegame.getQuestion) {
     // 2) Check if user is a participant in the game
-    let participantsNamesArr = [];
-  
-    livegame.participants.forEach((el) => {
-      participantsNamesArr.push(el.username);
-    });
-  
-    if (!participantsNamesArr.includes(req.user.username)) {
+    if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError('You are not a participant in this game!', 400));
+    }
+
+    // Add the participant's Ids to the active participant's array
+    if (!livegame.activeParticipants.includes(req.user._id)) {
+      livegame.activeParticipants.push(req.user._id);
+      await livegame.save();
     }
 
     // 3) Make the Id of the game the current game Id in the user's model
@@ -236,21 +226,234 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     };
 
     user.currentGame.push(objectForcurrentGame);
+    
+    if (currentTime < livegame.gameTime) {
+      console.log('1');
+      res.status(200).json({
+        status: 'success',
+        message: 'You have been taken to the game zone.'
+      });
+    }
+    //INITIALIZING GAME
+    if (currentTime >= livegame.gameTime && !livegame.gameInit && !livegame.getQuestion) {
+        // console.log('intializing game working')
+      // 4) Set question state(current question) to 0
+      livegame.currentQuestion = 0;
 
+      // 5) Set questions timer to 30 seconds.
+      livegame.questionsTimer = timer;
+
+      livegame.gameInit = true;
+
+      await livegame.save();
+      await user.save();
+
+      console.log('2');
+      // res.status(200).json({
+      //   status: 'success',
+      //   message: 'The game will start now.'
+      // });
+    }
+  } else if (currentTime < livegame.gameTime) {
+    console.log('3');
+    res.status(200).json({
+      status: 'success',
+      message: 'The game hasn\'t started yet.'
+    });
+  }
+  //PLAYING THE GAME
+  //GET THE QUESTIONS
+  if (livegame.gameInit && currentTime < livegame.questionsTimer && !answer && !livegame.getQuestion) {
+    livegame.getQuestion = true;
+    await livegame.save();
+
+    if (currentTime >= livegame.gameTime && livegame.activeStatus && livegame.getQuestion/*&& !livegame.gameInit*/) {
+  
+        // 2) Check if user is a participant in the game
+        if (!livegame.participants.includes(req.user._id)) {
+          return next(new AppError('You are not a participant in this game!', 400));
+        }
+                
+        await livegame.save();
+        await user.save();
+    
+        console.log('4');
+        res.status(200).json({
+          status: 'success',
+          question: livegame.questions[livegame.currentQuestion].question,
+          options: livegame.questions[livegame.currentQuestion].options,
+          message: 'The game has started.'
+        });
+    }
+  } else if (livegame.gameInit && currentTime > livegame.questionsTimer) {
+    console.log('user removed!');
+  }
+      
+  //MOVING TO THE NEXT QUESTION
+  if (currentTime >= livegame.gameTime && livegame.gameInit && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer) {
     // 4) Set question state(current question) to 0
-    livegame.currentQuestion = 0;
-
+    livegame.currentQuestion = livegame.currentQuestion + 1;
     // 5) Set questions timer to 30 seconds.
-    livegame.questionsTimer = 30;
+    livegame.questionsTimer = +livegame.gameTime + 30000;
 
     await livegame.save();
-    await user.save();
 
     res.status(200).json({
       status: 'success',
-      message: 'You have been taken to the game zone.'
+      question: livegame.questions[livegame.currentQuestion].question,
+      options: livegame.questions[livegame.currentQuestion].options,
+      message: 'Next Question.'
     });
-  } else {
-    return next(new AppError('This game is either not yet active or it is not yet time', 400));
+    console.log('5.0');
   }
+
+  //SUBMITTING ANSWERS
+  if (livegame.gameInit && currentTime < livegame.questionsTimer && answer) {
+    if (currentTime >= livegame.gameTime && livegame.activeStatus && livegame.getQuestion) {
+  
+      // Check if user is a participant in the game
+      if (!livegame.participants.includes(req.user._id)) {
+        return next(new AppError('You are not a participant in this game!', 400));
+      }
+  
+      if (!livegame.activeParticipants.includes(req.user._id)) {
+        return next(new AppError('You have failed a question and no longer a participant in this game!', 400));
+      }
+
+      //Remove user from game if they get the answer wrong
+      if (answer != livegame.questions[livegame.currentQuestion].answer) {
+        // livegame.activeParticipants = livegame.activeParticipants.filter((el) => el != req.user._id);
+        livegame.activeParticipants.splice(-1);
+        await livegame.save();
+        console.log('remove active participants');
+      //   console.log(req.user._id);
+      // console.log(livegame.activeParticipants);
+      }
+  
+      await livegame.save();
+      await user.save();
+  
+      console.log('5');
+
+      res.status(200).json({
+        status: 'success',
+        message: (answer == livegame.questions[livegame.currentQuestion].answer) ? 'Correct!' : 'Wrong'
+      });
+    }
+  }
+
+  //IF EXTRALIFE OR ERASER IS BEING USED
+  if (livegame.gameInit && currentTime < livegame.questionsTimer && !answer && action) {
+    if (currentTime >= livegame.gameTime && livegame.activeStatus && livegame.getQuestion) {
+  
+      // Check if user is a participant in the game
+      if (!livegame.participants.includes(req.user._id)) {
+        return next(new AppError('You are not a participant in this game!', 400));
+      }
+  
+      if (req.user.erasers != 0 && action == 'eraser') {
+        if (!livegame.activeParticipants.includes(req.user._id)) {
+          livegame.activeParticipants.push(req.user._id);
+          await livegame.save();
+        }
+        req.user.eraser = req.user.eraser - 1;
+        await user.save();
+
+      } else if (req.user.extraLives != 0 && action == 'extralife') {
+        if (!livegame.activeParticipants.includes(req.user._id)) {
+          livegame.activeParticipants.push(req.user._id);
+          await livegame.save();
+        }
+        req.user.extraLives = req.user.extraLives - 1;
+        await user.save();
+
+      } else {
+        res.status(200).json({
+          status: 'success',
+          message: 'Sorry, you do not have enough erasers or extralives.'
+        });
+      }
+  
+      await livegame.save();
+      await user.save();
+  
+      console.log('6');
+
+      res.status(200).json({
+        status: 'success',
+        message: (answer == livegame.questions[livegame.currentQuestion].answer) ? 'Correct!' : 'Wrong'
+      });
+    }
+  }
+
+
+
+
+
+
+
+
+  //PLAYING THE GAME
+  //GET THE QUESTIONS
+  // if (livegame.gameInit && currentTime < livegame.questionsTimer && !req.params.answer) {
+  
+  //   if (currentTime >= livegame.gameTime && livegame.activeStatus /*&& !livegame.gameInit*/) {
+  
+  //     // 2) Check if user is a participant in the game
+  //     if (!livegame.participants.includes(req.user._id)) {
+  //       return next(new AppError('You are not a participant in this game!', 400));
+  //     }
+     
+  //     await livegame.save();
+  //     await user.save();
+  
+  //     res.status(200).json({
+  //       status: 'success',
+  //       question: livegame.questions[livegame.currentQuestion].question,
+  //       options: livegame.questions[livegame.currentQuestion].options,
+  //       message: 'The game has started.'
+  //     });
+  //   }
+  // } else {
+  //   console.log('Displaying the questions part');
+  //   return next(new AppError('This game is either not yet active or it is not yet time', 400));
+  // }
+  
+  // //SUBMIT ANSWERS
+  // if (livegame.gameInit && currentTime < livegame.questionsTimer && req.params.answer) {
+  
+  //   if (currentTime >= livegame.gameTime && livegame.activeStatus /*&& !livegame.gameInit*/) {
+  
+  //     // 2) Check if user is a participant in the game
+  //     if (!livegame.participants.includes(req.user._id)) {
+  //       return next(new AppError('You are not a participant in this game!', 400));
+  //     }
+  
+  //     //Remove user from game if they get the answer wrong
+  //     if (!(answer == livegame.questions[livegame.currentQuestion].answer)) {
+  //       livegame.activeParticipants = livegame.activeParticipants.filter((el) => {
+  //         return el !== req.user._id;
+  //       });
+  //     }
+  
+  //     await livegame.save();
+  //     await user.save();
+  
+  //     res.status(200).json({
+  //       status: 'success',
+  //       // result:  : 'Correct' ,
+  //       // answer: livegame.questions[livegame.currentQuestion].opt,
+  //       message: (answer == livegame.questions[livegame.currentQuestion].answer) ? 'Correct!' : 'Wrong'
+  //     });
+  //   }
+  // } else {
+  //   console.log(currentTime);
+  //   console.log(twoMinsToGameTime);
+  //   console.log(livegame.activeStatus);
+  //   console.log(livegame.gameInit);
+  //   console.log(livegame.currentQuestion);
+
+  //   return next(new AppError('This game is either not yet active or it is not yet time', 400));
+  // }
 });
+

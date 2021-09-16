@@ -24,8 +24,8 @@ router.route('/livegame')
   .get(userController.getAllLiveGames)
   .post(userController.joinLiveGame);
 
-router.route('/gamezone/:gameId')
-  .get(userController.gameZone);
+router.route('/gamezone')
+  .post(userController.gameZone);
 
 router.route('/logout').get(authController.logout);
 
