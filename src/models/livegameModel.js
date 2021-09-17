@@ -48,7 +48,11 @@ const livegameSchema = new mongoose.Schema({
         type: Boolean,
         default: false //Set to true once gAME HAS OFFICIALLY STARTED
     },
-    getQuestion: {
+    gameEnded: {
+        type: Boolean,
+        default: false
+    },
+    userHasEarned: {
         type: Boolean,
         default: false
     }
@@ -59,6 +63,13 @@ livegameSchema.pre(/^find/, function(next) {
         path: 'createdBy',
         select: 'name'
     });
+    next();
+});
+
+livegameSchema.pre(/^find/, function(next) {
+    this.find({activeStatus : {$ne: false}});
+    // this.find({gameTime: {$gt: Date.parse(new Date())}});
+
     next();
 });
 
