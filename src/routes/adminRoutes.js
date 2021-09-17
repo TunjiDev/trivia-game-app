@@ -32,6 +32,7 @@ router.route('/user')
     .get(adminController.getAllUsers);
 
 router.route('/user/:id')
-    .get(adminController.getUser);
+    .get(adminController.getUser)
+    .put(adminController.updateUser);
 
 module.exports = router;

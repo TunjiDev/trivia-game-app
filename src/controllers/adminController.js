@@ -174,6 +174,22 @@ exports.getUser = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+  });
+
+  if (!user) return next(new AppError('No User found with that ID', 404));
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          user
+      }
+  });
+});
+
 //LIVE GAME
 exports.createLiveGame = catchAsync(async (req, res, next) => {
   if (!req.body.createdBy) req.body.createdBy = req.admin.id;
