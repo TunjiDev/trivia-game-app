@@ -51,10 +51,6 @@ const livegameSchema = new mongoose.Schema({
     gameEnded: {
         type: Boolean,
         default: false
-    },
-    userHasEarned: {
-        type: Boolean,
-        default: false
     }
 }, {timestamps: true});
 
