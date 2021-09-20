@@ -336,6 +336,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   //******************************************* */
   // GAME ZONE: STEP 4
   //SUBMITTING ANSWERS
+  // comment out currentTime < livegame.questionsTimer when testing
   if (livegame.gameInit && currentTime >= livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer) {
     // Check if user is a participant in the game in the first place
     if (!livegame.participants.includes(req.user._id)) {
@@ -408,6 +409,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       }
       req.user.extraLives = req.user.extraLives - 1;
       await user.save();
+
+      res.status(200).json({
+        status: "success",
+        question: livegame.questions[livegame.currentQuestion].question,
+        options: livegame.questions[livegame.currentQuestion].options,
+        message: "Question has been returned"
+      });
     } else {
     console.log("7");
       res.status(200).json({
