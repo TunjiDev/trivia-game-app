@@ -254,8 +254,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     /// STAR 1: **** Since this is true, I removed the other instance of this below in (INSTANCE 1). the two will both be true thereby causing error
     // check if it's now time for the game to be played.
     // If yes, do nothing....
-    if (currentTime < livegame.gameTime) {
-      console.log("1");
+    if (currentTime < +livegame.gameTime) {
+      console.log("1. Taken to game zone");
       // console.log(livegame);
       res.status(200).json({
         status: "success",
@@ -263,7 +263,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       });
     }
     //INITIALIZING GAME
-    if (currentTime >= livegame.gameTime && !livegame.gameInit) {
+    if (currentTime >= +livegame.gameTime && !livegame.gameInit) {
       // 4) Set current question to 0
       livegame.currentQuestion = 0;
 
@@ -275,7 +275,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       await livegame.save();
       await user.save();
 
-      console.log("2");
+      console.log("2. Game Initialized");
     }
   }
   // INSTANCE 1
@@ -290,31 +290,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   // }
 
   //******************************************* */
-  // GAME ZONE: STEP 2
-  //GET THE QUESTIONS
-  if (livegame.gameInit && currentTime >= livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer) {
-    // Check if user is a participant in the game
-    if (!livegame.participants.includes(req.user._id)) {
-      return next(new AppError("You are not a participant in this game!", 400));
-    }
-
-    console.log("3");
-    res.status(200).json({
-      status: "success",
-      question: livegame.questions[livegame.currentQuestion].question,
-      options: livegame.questions[livegame.currentQuestion].options,
-      message: "Question has been returned"
-    });
-  }
-
-  //******************************************* */
   // GAME ZONE: STEP 3
   //MOVING TO THE NEXT QUESTION
-  if (livegame.gameInit && currentTime >= livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !livegame.gameEnded) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !livegame.gameEnded) {
     // Increment question state by 1
     livegame.currentQuestion = livegame.currentQuestion + 1;
     // Set questions timer to 30 seconds.
-    livegame.questionsTimer = +livegame.gameTime + 30000;
+    livegame.questionsTimer = livegame.questionsTimer + 30000;
 
     await livegame.save();
     
@@ -324,20 +306,52 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       await livegame.save();
     }
 
+    console.log("4. Moved to Next question")
     res.status(200).json({
       status: "success",
       question: livegame.questions[livegame.currentQuestion].question,
       options: livegame.questions[livegame.currentQuestion].options,
       message: "Next Question."
     });
-    console.log("4");
+    // console.log("4");
+    console.log(currentTime);
+    console.log(livegame.questionsTimer);
   }
+
+  
+  //******************************************* */
+  // GAME ZONE: STEP 2
+  //GET THE QUESTIONS
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && livegame.currentQuestion > livegame.previousQuestion) {
+    // Check if user is a participant in the game
+    if (!livegame.participants.includes(req.user._id)) {
+      return next(new AppError("You are not a participant in this game!", 400));
+    }
+
+    livegame.previousQuestion = livegame.previousQuestion + 1;
+
+    await livegame.save();
+
+    console.log("3. question returned");
+    res.status(200).json({
+      status: "success",
+      question: livegame.questions[livegame.currentQuestion].question,
+      options: livegame.questions[livegame.currentQuestion].options,
+      message: "Question has been returned"
+    });
+  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && livegame.currentQuestion <= livegame.previousQuestion) {
+    res.status(200).json({
+      status: "success",
+      message: "Wait for next question!"
+    });
+  }
+
 
   //******************************************* */
   // GAME ZONE: STEP 4
   //SUBMITTING ANSWERS
   // comment out currentTime < livegame.questionsTimer when testing
-  if (livegame.gameInit && currentTime >= livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer) {
     // Check if user is a participant in the game in the first place
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -363,7 +377,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     await livegame.save();
     await user.save();
 
-    console.log("5");
+    console.log("5. Answere submitted");
+    console.log(currentTime);
+    console.log(livegame.questionsTimer);
 
     res.status(200).json({
       status: "success",
@@ -373,13 +389,19 @@ exports.gameZone = catchAsync(async (req, res, next) => {
           ? "Correct!"
           : "Wrong!",
     });
-  } else if (livegame.gameInit && currentTime >= livegame.gameTime && currentTime > livegame.questionsTimer && livegame.activeStatus && answer) {
-      return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime > livegame.questionsTimer && livegame.activeStatus && answer) {
+    console.log(currentTime);
+    console.log(livegame.questionsTimer);
+    console.log("6. Problem with answer")
+    res.status(200).json({
+      status: "success",
+      message: "Time up! cannot submit ths answer...."
+    });
     }
 
   // GAME ZONE: STEP 5
   //IF EXTRALIFE OR ERASER IS BEING USED
-  if (livegame.gameInit && currentTime >= livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && action) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && action) {
     // Check if user is a participant in the game
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -432,7 +454,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
     // GAME ZONE: STEP 6
     //SPLIT THE MONEY(REWARD IN THE LIVEGAME MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
-  if (livegame.gameEnded && currentTime >= livegame.gameTime && livegame.gameInit && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer) {
+  if (livegame.gameEnded && currentTime >= +livegame.gameTime && livegame.gameInit && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer) {
     // Check if user is a participant in the game
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -456,9 +478,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
   // GAME ZONE: STEP 7
   // After game has ended and users have won their money, set active status back to false
-  if (livegame.gameEnded && livegame.gameTime >= fifteenMinsAfterGameTime) {
-    livegame.activeStatus = false;
+  // if (livegame.gameEnded && livegame.gameTime >= fifteenMinsAfterGameTime) {
+  //   livegame.activeStatus = false;
 
-    await livegame.save();
-  }
+  //   await livegame.save();
+  // }
 });

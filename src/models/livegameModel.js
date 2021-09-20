@@ -35,6 +35,10 @@ const livegameSchema = new mongoose.Schema({
         type: Number,
         default: -1
     },
+    previousQuestion: {
+        type: Number,
+        default: -1
+    },
     questionsTimer: {
         type: Number,
         default: 0
