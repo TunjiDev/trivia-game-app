@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const livegameController = require('../controllers/livegameController');
 
 //SUPERADMIN AUTHENTICATION
 router.post('/signup', adminController.signup);
@@ -10,13 +11,13 @@ router.use(adminController.protected);
 
 //LIVEGAME
 router.route('/livegame')
-    .get(adminController.getAllLiveGames)
-    .post(adminController.createLiveGame);
+    .get(livegameController.getAllLiveGames)
+    .post(livegameController.createLiveGame);
 
 router.route('/livegame/:id')
-    .get(adminController.getLivegame)
-    .patch(adminController.updateLivegame)
-    .delete(adminController.deleteLiveGame);
+    .get(livegameController.getLivegame)
+    .patch(livegameController.updateLivegame)
+    .delete(livegameController.deleteLiveGame);
 
 //ADMINS
 router.route('/lesseradmin')
