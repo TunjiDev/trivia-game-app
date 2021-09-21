@@ -221,7 +221,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   const action = req.body.action;
   const currentTime = Date.parse(new Date());
   const twoMinsToGameTime = +livegame.gameTime - 120000;
-  const fifteenMinsAfterGameTime = +livegame.gameTime + 900000;
   const timer = +livegame.gameTime + 30000;
 
   //******************************************* */
@@ -256,7 +255,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     // If yes, do nothing....
     if (currentTime < +livegame.gameTime) {
       console.log("1. Taken to game zone");
-      // console.log(livegame);
       res.status(200).json({
         status: "success",
         message: "You have been taken to the game zone.",
@@ -292,7 +290,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   //******************************************* */
   // GAME ZONE: STEP 3
   //MOVING TO THE NEXT QUESTION
-  if (livegame.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !livegame.gameEnded) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !action && !livegame.gameEnded) {
     // Increment question state by 1
     livegame.currentQuestion = livegame.currentQuestion + 1;
     // Set questions timer to 30 seconds.
@@ -314,15 +312,15 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       message: "Next Question."
     });
     // console.log("4");
-    console.log(currentTime);
-    console.log(livegame.questionsTimer);
+    // console.log(currentTime);
+    // console.log(livegame.questionsTimer);
   }
 
   
   //******************************************* */
   // GAME ZONE: STEP 2
   //GET THE QUESTIONS
-  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && livegame.currentQuestion > livegame.previousQuestion) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && livegame.currentQuestion > livegame.previousQuestion) {
     // Check if user is a participant in the game
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -339,7 +337,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       options: livegame.questions[livegame.currentQuestion].options,
       message: "Question has been returned"
     });
-  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && livegame.currentQuestion <= livegame.previousQuestion) {
+  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && livegame.currentQuestion <= livegame.previousQuestion) {
     res.status(200).json({
       status: "success",
       message: "Wait for next question!"
@@ -351,7 +349,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   // GAME ZONE: STEP 4
   //SUBMITTING ANSWERS
   // comment out currentTime < livegame.questionsTimer when testing
-  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer && !action) {
     // Check if user is a participant in the game in the first place
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -374,12 +372,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
       await livegame.save();
     }
 
-    await livegame.save();
-    await user.save();
-
-    console.log("5. Answere submitted");
-    console.log(currentTime);
-    console.log(livegame.questionsTimer);
+    console.log("5. Answer submitted");
+    // console.log(currentTime);
+    // console.log(livegame.questionsTimer);
 
     res.status(200).json({
       status: "success",
@@ -389,9 +384,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
           ? "Correct!"
           : "Wrong!",
     });
-  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime > livegame.questionsTimer && livegame.activeStatus && answer) {
-    console.log(currentTime);
-    console.log(livegame.questionsTimer);
+  } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime > livegame.questionsTimer && livegame.activeStatus && answer && !action) {
+    // console.log(currentTime);
+    // console.log(livegame.questionsTimer);
     console.log("6. Problem with answer")
     res.status(200).json({
       status: "success",
@@ -401,7 +396,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
   // GAME ZONE: STEP 5
   //IF EXTRALIFE OR ERASER IS BEING USED
-  if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && action) {
+  if (livegame.gameInit && currentTime >= +livegame.gameTime && /*currentTime < livegame.questionsTimer && */livegame.activeStatus && !answer && action) {
     // Check if user is a participant in the game
     if (!livegame.participants.includes(req.user._id)) {
       return next(new AppError("You are not a participant in this game!", 400));
@@ -409,9 +404,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
     ///// INSTANCE 3: ERASER does not put the user back into the game. It only removes one wrong answer. But this one can be fixed later.
     ///// INSTANCE 4: I changed it from checking if the eraser and extralives != 0 to > 0. They can only use erasers if they have at least one.
-    /// Check if it's eraser that's being used
-    if (req.user.erasers > 0 && action == "eraser") {
-      req.user.eraser = req.user.eraser - 1;
+    // Check if it's eraser that's being used
+    if (user.erasers > 0 && action === "eraser") {
+      user.eraser = user.eraser - 1;
       await user.save();
 
     console.log("6");
@@ -423,20 +418,26 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         message: "Question has been returned"
       });
     }
-    /// Check if the user is using extra life
-    else if (req.user.extraLives > 0 && action == "extralife") {
+    // Check if the user is using extra life
+    else if (user.extraLives > 0 && action === "extralife") {
       if (!livegame.activeParticipants.includes(req.user._id)) {
         livegame.activeParticipants.push(req.user._id);
         await livegame.save();
       }
-      req.user.extraLives = req.user.extraLives - 1;
+      user.extraLives = user.extraLives - 1;
+
       await user.save();
+
+      // console.log(livegame.activeParticipants);
+      // console.log("extralife used");
+      // console.log(action);
+      // console.log(user.extraLives);
 
       res.status(200).json({
         status: "success",
         question: livegame.questions[livegame.currentQuestion].question,
         options: livegame.questions[livegame.currentQuestion].options,
-        message: "Question has been returned"
+        message: "You have used an extralife and have been taken to the next question"
       });
     } else {
     console.log("7");
@@ -445,9 +446,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         message: "Sorry, you do not have enough erasers or extralives.",
       });
     }
-
-    await livegame.save();
-    await user.save();
 
     console.log("8");
   }
@@ -461,11 +459,11 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     }
     // Check if user is still an active participant
     if (!livegame.activeParticipants.includes(req.user._id)) {
-      return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+      return next(new AppError("You have failed a question and are no longer a participant in this game!", 400));
     }
     const moneyWon = livegame.reward / livegame.activeParticipants.length;
 
-    user.earnings = moneyWon;
+    user.earnings = user.earnings + moneyWon;
 
     await user.save();
 
