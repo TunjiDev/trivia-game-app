@@ -3,6 +3,7 @@ const AppError = require("../error/appError");
 const User = require("../models/userModel");
 const Livegame = require("../models/livegameModel");
 const APIFeatures = require("../../utils/apiFeatures");
+const Question = require('../models/questionModel');
 
 //========================== FOR ADMINS =============================
 exports.createLiveGame = catchAsync(async (req, res, next) => {
@@ -369,7 +370,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             return next(new AppError("You are not a participant in this game!", 400));
         }
         
-        if (livegame.questionsTimer + 10000 > currentTime) {
+        if (livegame.questionsTimer - 15000 > currentTime) {
             livegame.previousQuestion = livegame.previousQuestion + 1;
         }
     
