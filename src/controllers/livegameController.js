@@ -263,7 +263,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     const answer = req.body.answer;
     const action = req.body.action;
     const currentTime = Date.parse(new Date());
-    const twoMinsToGameTime = +livegame.gameTime - 120000;
+    const twoMinsToGameTime = +livegame.gameTime - 180000;
     const timer = +livegame.gameTime + 30000;
   
     //******************************************* */
