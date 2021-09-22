@@ -368,8 +368,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
         }
-    
-        livegame.previousQuestion = livegame.previousQuestion + 1;
+        
+        if (livegame.questionsTimer + 10000 > currentTime) {
+            livegame.previousQuestion = livegame.previousQuestion + 1;
+        }
     
         await livegame.save();
     
