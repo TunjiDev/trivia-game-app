@@ -1,7 +1,7 @@
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../error/appError");
 const User = require("../models/userModel");
-const Livegame = require("../models/livegameModel");
+const Livegamedemo = require("../models/livegameDEMOModel");
 const APIFeatures = require("../../utils/apiFeatures");
 
 //========================== FOR ADMINS =============================
@@ -64,7 +64,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
   
     if(gameTime >= DateA && gameTime < futureDateB) {
         if (mergedResults.length >= 10) {
-            newLiveGame = await Livegame.create({
+            newLiveGame = await Livegamedemo.create({
             categoryName: req.body.categoryName,
             gameTime,
             entryFee: req.body.entryFee,
@@ -93,7 +93,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 });
   
 exports.getAllLiveGames = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Livegame.find(), req.query)
+    const features = new APIFeatures(Livegamedemo.find(), req.query)
         .filter()
         .sort()
         .paginate();
@@ -110,7 +110,7 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
 });
   
 exports.getLivegame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegame.findById(req.params.id);
+    const livegame = await Livegamedemo.findById(req.params.id);
   
     if (!livegame) return next(new AppError('No Livegame found with that ID', 404));
   
@@ -123,7 +123,7 @@ exports.getLivegame = catchAsync(async (req, res, next) => {
 });
   
 exports.updateLivegame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegame.findByIdAndUpdate(req.params.id, req.body, {
+    const livegame = await Livegamedemo.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
     });
@@ -144,7 +144,7 @@ exports.updateLivegame = catchAsync(async (req, res, next) => {
 });
   
 exports.deleteLiveGame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegame.findByIdAndDelete(req.params.id);
+    const livegame = await Livegamedemo.findByIdAndDelete(req.params.id);
   
     if (!livegame) return next(new AppError('No livegame found with that ID', 404));
   
@@ -156,7 +156,7 @@ exports.deleteLiveGame = catchAsync(async (req, res, next) => {
 
 //========================== FOR USERS =============================
 exports.getAllLiveGames = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Livegame.find(), req.query)
+    const features = new APIFeatures(Livegamedemo.find(), req.query)
       .filter()
       .sort()
       .paginate();
@@ -174,7 +174,7 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
   
 exports.joinLiveGame = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.user.id);
-    const livegame = await Livegame.findOne({
+    const livegame = await Livegamedemo.findOne({
         categoryName: req.body.categoryName,
     });
     const twoMinsToGameTime = +livegame.gameTime - 120000;
@@ -258,7 +258,7 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   
 //========================== GAME ZONE(STILL FOR USERS) =============================
 exports.gameZone = catchAsync(async (req, res, next) => {
-    const livegame = await Livegame.findById(req.body.gameId);
+    const livegame = await Livegamedemo.findById(req.body.gameId);
     const user = await User.findById(req.user.id);
     const answer = req.body.answer;
     const action = req.body.action;
@@ -292,8 +292,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         };
     
         user.currentGame.push(objectForcurrentGame);
-        await user.save();
-        
+    
         /// STAR 1: **** Since this is true, I removed the other instance of this below in (INSTANCE 1). the two will both be true thereby causing error
         // check if it's now time for the game to be played.
         // If yes, do nothing....
@@ -315,6 +314,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             livegame.gameInit = true;
     
             await livegame.save();
+            await user.save();
     
             console.log("2. Game Initialized");
         }

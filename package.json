@@ -10,7 +10,7 @@
     "prod": "NODE_ENV=production nodemon server.js",
     "kill": "sudo pkill -f node",
     "testuser": "mocha ./test/user.test.js",
-    "test": "mocha",
+    "test": "mocha --timeout 20000",
     "deploy:heroku": "git push heroku main"
   },
   "keywords": [],

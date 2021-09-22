@@ -67,6 +67,16 @@ questionSchema.pre(/^find/, function(next) {
     next();
 });
 
+//Hashing the answer
+questionSchema.pre('save', async function(next) {
+  //Only run this funtion is password was actually modified
+  if (!this.isModified('answer')) return next();
+
+  //Hash the answer with cost of 12
+  this.answer = await bcrypt.hash(this.answer, 12);
+  next();
+});
+
 questionSchema.index({ difficulty: 1 });
 
 const Question = mongoose.model('Question', questionSchema);
