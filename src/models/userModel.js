@@ -37,11 +37,11 @@ const userSchema = new mongoose.Schema({
   },
   erasers: {
     type: Number,
-    default: 0
+    default: 15
   },
   extraLives: {
     type: Number,
-    default: 0
+    default: 15
   },
   earnings: {
     type: Number,
