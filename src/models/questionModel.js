@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 
 const questionSchema = new mongoose.Schema(
   {
@@ -69,14 +69,14 @@ questionSchema.pre(/^find/, function(next) {
 });
 
 //Hashing the answer
-questionSchema.pre('save', async function(next) {
-  //Only run this funtion is password was actually modified
-  if (!this.isModified('answer')) return next();
+// questionSchema.pre('save', async function(next) {
+//   //Only run this funtion is password was actually modified
+//   if (!this.isModified('answer')) return next();
 
-  //Hash the answer with cost of 12
-  this.answer = await bcrypt.hash(this.answer, 12);
-  next();
-});
+//   //Hash the answer with cost of 12
+//   this.answer = await bcrypt.hash(this.answer, 12);
+//   next();
+// });
 
 questionSchema.index({ difficulty: 1 });
 

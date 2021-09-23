@@ -1,7 +1,7 @@
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../error/appError");
 const User = require("../models/userModel");
-const Livegamedemo = require("../models/livegameDEMOModel");
+const Livegame = require("../models/livegameModel");
 const APIFeatures = require("../../utils/apiFeatures");
 const Question = require('../models/questionModel');
 
@@ -65,7 +65,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
   
     if(gameTime >= DateA && gameTime < futureDateB) {
         if (mergedResults.length >= 10) {
-            newLiveGame = await Livegamedemo.create({
+            newLiveGame = await Livegame.create({
             categoryName: req.body.categoryName,
             gameTime,
             entryFee: req.body.entryFee,
@@ -94,7 +94,7 @@ exports.createLiveGame = catchAsync(async (req, res, next) => {
 });
   
 exports.getAllLiveGames = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Livegamedemo.find(), req.query)
+    const features = new APIFeatures(Livegame.find(), req.query)
         .filter()
         .sort()
         .paginate();
@@ -111,7 +111,7 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
 });
   
 exports.getLivegame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegamedemo.findById(req.params.id);
+    const livegame = await Livegame.findById(req.params.id);
   
     if (!livegame) return next(new AppError('No Livegame found with that ID', 404));
   
@@ -124,7 +124,7 @@ exports.getLivegame = catchAsync(async (req, res, next) => {
 });
   
 exports.updateLivegame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegamedemo.findByIdAndUpdate(req.params.id, req.body, {
+    const livegame = await Livegame.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
     });
@@ -145,7 +145,7 @@ exports.updateLivegame = catchAsync(async (req, res, next) => {
 });
   
 exports.deleteLiveGame = catchAsync(async (req, res, next) => {
-    const livegame = await Livegamedemo.findByIdAndDelete(req.params.id);
+    const livegame = await Livegame.findByIdAndDelete(req.params.id);
   
     if (!livegame) return next(new AppError('No livegame found with that ID', 404));
   
@@ -157,7 +157,7 @@ exports.deleteLiveGame = catchAsync(async (req, res, next) => {
 
 //========================== FOR USERS =============================
 exports.getAllLiveGames = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Livegamedemo.find(), req.query)
+    const features = new APIFeatures(Livegame.find(), req.query)
       .filter()
       .sort()
       .paginate();
@@ -175,7 +175,7 @@ exports.getAllLiveGames = catchAsync(async (req, res, next) => {
   
 exports.joinLiveGame = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.user.id);
-    const livegame = await Livegamedemo.findOne({
+    const livegame = await Livegame.findOne({
         categoryName: req.body.categoryName,
     });
     const twoMinsToGameTime = +livegame.gameTime - 120000;
@@ -259,13 +259,14 @@ exports.joinLiveGame = catchAsync(async (req, res, next) => {
   
 //========================== GAME ZONE(STILL FOR USERS) =============================
 exports.gameZone = catchAsync(async (req, res, next) => {
-    const livegame = await Livegamedemo.findById(req.body.gameId);
+    const livegame = await Livegame.findById(req.body.gameId);
     const user = await User.findById(req.user.id);
     const answer = req.body.answer;
     const action = req.body.action;
     const currentTime = Date.parse(new Date());
     const twoMinsToGameTime = +livegame.gameTime - 120000;
     const timer = +livegame.gameTime + 30000;
+    let objectForcurrentGame;
   
     //******************************************* */
     // **** GAME ZONE: STEP 1
@@ -284,15 +285,20 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
     
         // 3) Make the Id of the game the current game Id in the user's model
-        let objectForcurrentGame = {
-            currentGameId: livegame._id,
-            timer: livegame.questionsTimer,
-            eraser: user.erasers,
-            extraLife: user.extraLives,
-            gameStatus: livegame.activeStatus,
-        };
-    
-        user.currentGame.push(objectForcurrentGame);
+        if (!user.currentGame.includes(objectForcurrentGame)) {
+            objectForcurrentGame = {
+                currentGameId: livegame._id,
+                timer: livegame.questionsTimer,
+                eraser: user.erasers,
+                extraLife: user.extraLives,
+                gameStatus: livegame.activeStatus,
+                currentQuestion: -1,
+                previousQuestion: -1
+            };
+        
+            user.currentGame.push(objectForcurrentGame);
+            await user.save();
+        }
     
         /// STAR 1: **** Since this is true, I removed the other instance of this below in (INSTANCE 1). the two will both be true thereby causing error
         // check if it's now time for the game to be played.
@@ -307,7 +313,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         //INITIALIZING GAME
         if (currentTime >= +livegame.gameTime && !livegame.gameInit) {
             // 4) Set current question to 0
-            livegame.currentQuestion = 0;
+            user.currentQuestion = 0;
     
             // 5) Set questions timer to 30 seconds.
             livegame.questionsTimer = timer;
@@ -318,6 +324,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
     
             console.log("2. Game Initialized");
+            console.log(user.currentQuestion);
         }
     }
     // INSTANCE 1
@@ -336,52 +343,54 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     //MOVING TO THE NEXT QUESTION
     if (livegame.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !action && !livegame.gameEnded) {
         // Increment question state by 1
-        livegame.currentQuestion = livegame.currentQuestion + 1;
+        user.currentQuestion = user.currentQuestion + 1;
         // Set questions timer to 30 seconds.
         livegame.questionsTimer = livegame.questionsTimer + 30000;
     
         await livegame.save();
+        await user.save();
         
-        if (livegame.currentQuestion > 8) {
+        if (user.currentQuestion > 8) {
             livegame.gameEnded = true;
     
             await livegame.save();
         }
     
-        console.log("4. Moved to Next question")
+        console.log("4. Moved to Next question");
+        console.log(user.currentQuestion);
+
         res.status(200).json({
             status: "success",
-            question: livegame.questions[livegame.currentQuestion].question,
-            options: livegame.questions[livegame.currentQuestion].options,
+            question: livegame.questions[user.currentQuestion].question,
+            options: livegame.questions[user.currentQuestion].options,
             message: "Next Question."
         });
-        // console.log("4");
-        // console.log(currentTime);
-        // console.log(livegame.questionsTimer);
     }
   
     
     //******************************************* */
     // GAME ZONE: STEP 2
     //GET THE QUESTIONS
-    if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && livegame.currentQuestion > livegame.previousQuestion) {
+    if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion > user.previousQuestion) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
         }
     
-        livegame.previousQuestion = livegame.previousQuestion + 1;
+        user.previousQuestion = user.previousQuestion + 1;
     
-        await livegame.save();
+        await user.save();
     
         console.log("3. question returned");
+        console.log(user.currentQuestion);
+
         res.status(200).json({
             status: "success",
-            question: livegame.questions[livegame.currentQuestion].question,
-            options: livegame.questions[livegame.currentQuestion].options,
+            question: livegame.questions[user.currentQuestion].question,
+            options: livegame.questions[user.currentQuestion].options,
             message: "Question has been returned"
         });
-    } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && livegame.currentQuestion <= livegame.previousQuestion) {
+    } else if (livegame.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion <= user.previousQuestion) {
         res.status(200).json({
             status: "success",
             message: "Wait for next question!"
@@ -409,21 +418,19 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
     
         //Remove user from game if they get the answer wrong
-        if (answer !== livegame.questions[livegame.currentQuestion].answer) {
+        if (answer !== livegame.questions[user.currentQuestion].answer) {
             const userIndex = livegame.activeParticipants.indexOf(req.user._id);
             livegame.activeParticipants.splice(userIndex, 1);
             await livegame.save();
         }
     
         console.log("5. Answer submitted");
-        // console.log(currentTime);
-        // console.log(livegame.questionsTimer);
     
         res.status(200).json({
             status: "success",
             timer: livegame.questionsTimer,
             message:
-            answer == livegame.questions[livegame.currentQuestion].answer
+            answer == livegame.questions[user.currentQuestion].answer
                 ? "Correct!"
                 : "Wrong!",
         });
@@ -455,9 +462,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("6");
             res.status(200).json({
                 status: "success",
-                question: livegame.questions[livegame.currentQuestion].question,
-                options: livegame.questions[livegame.currentQuestion].options,
-                answer: livegame.questions[livegame.currentQuestion].answer,
+                question: livegame.questions[user.currentQuestion].question,
+                options: livegame.questions[user.currentQuestion].options,
+                answer: livegame.questions[user.currentQuestion].answer,
                 message: "Question has been returned"
             });
         }
@@ -478,8 +485,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     
             res.status(200).json({
                 status: "success",
-                question: livegame.questions[livegame.currentQuestion + 1].question,
-                options: livegame.questions[livegame.currentQuestion + 1].options,
+                question: livegame.questions[user.currentQuestion + 1].question,
+                options: livegame.questions[user.currentQuestion + 1].options,
                 message: "You have used an extralife and have been taken to the next question"
             });
         } else {

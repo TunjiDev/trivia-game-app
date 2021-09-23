@@ -54,7 +54,15 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   activeGames: [], //This would eventually contain an object with the livegame Id and game time
-  currentGame: [] //This would eventually contain an object with the current game Id, questionTimer,  eraser, extralife, gamestatus.
+  currentGame: [], //This would eventually contain an object with the current game Id, questionTimer,  eraser, extralife, gamestatus.
+  currentQuestion: {
+    type: Number,
+    default: -1
+  },
+  previousQuestion: {
+    type: Number,
+    default: -1
+  }
 }, {timestamps: true});
 
 const User = mongoose.model('user', userSchema);
