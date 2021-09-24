@@ -450,7 +450,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   
     // GAME ZONE: STEP 5
     //IF EXTRALIFE OR ERASER IS BEING USED
-    if (user.gameInit && currentTime >= +livegame.gameTime && /*currentTime < user.questionsTimer && */livegame.activeStatus && !answer && action) {
+    if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < user.questionsTimer && livegame.activeStatus && !answer && action) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
