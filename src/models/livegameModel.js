@@ -31,10 +31,6 @@ const livegameSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
-    questionsTimer: {
-        type: Number,
-        default: 0
-    },
     createdBy: {
         type: mongoose.Schema.ObjectId,
         ref: 'Admin',

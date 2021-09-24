@@ -290,7 +290,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         if (user.currentGame.length === 0) {
             objectForcurrentGame = {
                 currentGameId: livegame._id,
-                timer: livegame.questionsTimer,
+                timer: user.questionsTimer,
                 eraser: user.erasers,
                 extraLife: user.extraLives,
                 gameStatus: livegame.activeStatus,
@@ -320,11 +320,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             user.currentQuestion = 0;
     
             // 5) Set questions timer to 30 seconds.
-            livegame.questionsTimer = timer;
+            user.questionsTimer = timer;
     
             user.gameInit = true;
-    
-            await livegame.save();
+
             await user.save();
     
             console.log("2. Game Initialized");
@@ -345,13 +344,12 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     //******************************************* */
     // GAME ZONE: STEP 3
     //MOVING TO THE NEXT QUESTION
-    if (user.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer && !action && !user.gameEnded) {
+    if (user.gameInit && currentTime >= +livegame.gameTime && livegame.activeStatus && currentTime > user.questionsTimer && !answer && !action && !user.gameEnded) {
         // Increment question state by 1
         user.currentQuestion = user.currentQuestion + 1;
         // Set questions timer to 30 seconds.
-        livegame.questionsTimer = livegame.questionsTimer + 30000;
-    
-        await livegame.save();
+        user.questionsTimer = user.questionsTimer + 30000;
+
         await user.save();
         
         if (user.currentQuestion > 8) {
@@ -375,7 +373,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     //******************************************* */
     // GAME ZONE: STEP 2
     //GET THE QUESTIONS
-    if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion > user.previousQuestion) {
+    if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < user.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion > user.previousQuestion) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
@@ -394,7 +392,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             options: livegame.questions[user.currentQuestion].options,
             message: "Question has been returned"
         });
-    } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion <= user.previousQuestion) {
+    } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < user.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion <= user.previousQuestion) {
         res.status(200).json({
             status: "success",
             message: "Wait for next question!"
@@ -404,8 +402,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     //******************************************* */
     // GAME ZONE: STEP 4
     //SUBMITTING ANSWERS
-    // comment out currentTime < livegame.questionsTimer when testing
-    if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < livegame.questionsTimer && livegame.activeStatus && answer && !action) {
+    // comment out currentTime < user.questionsTimer when testing
+    if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < user.questionsTimer && livegame.activeStatus && answer && !action) {
         // Check if user is a participant in the game in the first place
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
@@ -432,13 +430,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     
         res.status(200).json({
             status: "success",
-            timer: livegame.questionsTimer,
+            timer: user.questionsTimer,
             message:
             answer == livegame.questions[user.currentQuestion].answer
                 ? "Correct!"
                 : "Wrong!",
         });
-    } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime > livegame.questionsTimer && livegame.activeStatus && answer && !action) {
+    } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime > user.questionsTimer && livegame.activeStatus && answer && !action) {
             console.log("6. Problem with answer")
             res.status(200).json({
                 status: "success",
@@ -448,7 +446,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   
     // GAME ZONE: STEP 5
     //IF EXTRALIFE OR ERASER IS BEING USED
-    if (user.gameInit && currentTime >= +livegame.gameTime && /*currentTime < livegame.questionsTimer && */livegame.activeStatus && !answer && action) {
+    if (user.gameInit && currentTime >= +livegame.gameTime && /*currentTime < user.questionsTimer && */livegame.activeStatus && !answer && action) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
@@ -499,7 +497,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   
       // GAME ZONE: STEP 6
       //SPLIT THE MONEY(REWARD IN THE LIVEGAME MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
-    if (user.gameEnded && currentTime >= +livegame.gameTime && user.gameInit && livegame.activeStatus && currentTime > livegame.questionsTimer && !answer) {
+    if (user.gameEnded && currentTime >= +livegame.gameTime && user.gameInit && livegame.activeStatus && currentTime > user.questionsTimer && !answer) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
