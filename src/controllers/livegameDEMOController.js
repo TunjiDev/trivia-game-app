@@ -437,10 +437,14 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 : "Wrong!",
         });
     } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime > user.questionsTimer && livegame.activeStatus && answer && !action) {
+            const userIndex = livegame.activeParticipants.indexOf(req.user._id);
+            livegame.activeParticipants.splice(userIndex, 1);
+            await livegame.save();
+
             console.log("6. Problem with answer")
             res.status(200).json({
                 status: "success",
-                message: "Time up! cannot submit ths answer...."
+                message: "Time up! cannot submit ths answer, you have been removed from the game!...."
             });
         }
   
@@ -456,7 +460,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         ///// INSTANCE 4: I changed it from checking if the eraser and extralives != 0 to > 0. They can only use erasers if they have at least one.
         // Check if it's eraser that's being used
         if (user.erasers > 0 && action === "eraser") {
-                user.eraser = user.eraser - 1;
+                user.erasers = user.erasers - 1;
                 await user.save();
         
             console.log("6");
