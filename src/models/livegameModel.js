@@ -39,14 +39,6 @@ const livegameSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Admin',
         required: [true, 'A Live game must be created by someone']
-    },
-    gameInit: {
-        type: Boolean,
-        default: false //Set to true once gAME HAS OFFICIALLY STARTED
-    },
-    gameEnded: {
-        type: Boolean,
-        default: false
     }
 }, {timestamps: true});
 

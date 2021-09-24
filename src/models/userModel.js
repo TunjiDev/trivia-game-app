@@ -62,6 +62,14 @@ const userSchema = new mongoose.Schema({
   previousQuestion: {
     type: Number,
     default: -1
+  },
+  gameInit: {
+      type: Boolean,
+      default: false //Set to true once gAME HAS OFFICIALLY STARTED
+  },
+  gameEnded: {
+      type: Boolean,
+      default: false
   }
 }, {timestamps: true});
 
