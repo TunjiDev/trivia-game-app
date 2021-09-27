@@ -436,7 +436,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 ? "Correct!"
                 : "Wrong!",
         });
-    } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime > user.questionsTimer && livegame.activeStatus && answer && !action) {
+    } /*else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime > user.questionsTimer && livegame.activeStatus && answer && !action) {
             const userIndex = livegame.activeParticipants.indexOf(req.user._id);
             livegame.activeParticipants.splice(userIndex, 1);
             await livegame.save();
@@ -446,7 +446,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 status: "success",
                 message: "Time up! cannot submit ths answer, you have been removed from the game!...."
             });
-        }
+        }*/
   
     // GAME ZONE: STEP 5
     //IF EXTRALIFE OR ERASER IS BEING USED
