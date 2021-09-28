@@ -509,7 +509,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   
       // GAME ZONE: STEP 6
       //SPLIT THE MONEY(REWARD IN THE LIVEGAME MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
-    if (user.gameEnded && currentTime >= +livegame.gameTime && user.gameInit && livegame.activeStatus && currentTime > user.questionsTimer && !answer) {
+    if (user.gameEnded && !user.moneyWon && currentTime >= +livegame.gameTime && user.gameInit && livegame.activeStatus && currentTime > user.questionsTimer && !answer) {
         // Check if user is a participant in the game
         if (!livegame.participants.includes(req.user._id)) {
             return next(new AppError("You are not a participant in this game!", 400));
@@ -521,8 +521,20 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         const moneyWon = livegame.reward / livegame.activeParticipants.length;
     
         user.earnings = user.earnings + moneyWon;
+
+        //RESETTING THE USER STATE AND REMOVING THEM FROM THE LIVEGAME AFTER GAME HAS ENDED AND MONEY HAS BEEN SHARED
+        user.currentQuestion = -1;
+        user.previousQuestion = -1;
+        user.gameEnded = false;
+        user.gameInit = false;
+        user.questionsTimer = 0;
+        user.activeGames = [];
+        user.currentGame = [];
+        livegame.participants = [];
+        livegame.activeParticipants = [];
     
         await user.save();
+        await livegame.save();
     
         console.log("9");
         res.status(200).json({
@@ -533,7 +545,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
   
     // GAME ZONE: STEP 7
     // After game has ended and users have won their money, set active status back to false
-    // if (user.gameEnded && livegame.gameTime >= fifteenMinsAfterGameTime) {
+    // if (user.gameEnded && user.moneyWon) {
     //   livegame.activeStatus = false;
   
     //   await livegame.save();
