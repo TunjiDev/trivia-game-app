@@ -488,10 +488,12 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
             await user.save();
     
+            console.log(user.currentQuestion);
+            console.log('extralife used');
             res.status(200).json({
                 status: "success",
-                question: livegame.questions[user.currentQuestion + 1].question,
-                options: livegame.questions[user.currentQuestion + 1].options,
+                question: livegame.questions[user.currentQuestion].question,
+                options: livegame.questions[user.currentQuestion].options,
                 message: "You have used an extralife and have been taken to the next question"
             });
         } else {
