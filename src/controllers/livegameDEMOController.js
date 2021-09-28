@@ -480,6 +480,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
             user.extraLives = user.extraLives - 1;
     
+            user.currentQuestion = user.currentQuestion + 1;
+            
             await user.save();
     
             res.status(200).json({
