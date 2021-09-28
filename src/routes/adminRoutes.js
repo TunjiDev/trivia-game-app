@@ -7,7 +7,7 @@ const livegameController = require('../controllers/livegameController');
 router.post('/signup', adminController.signup);
 router.post('/login', adminController.login);
 
-// router.use(adminController.protected);
+router.use(adminController.protected);
 
 //LIVEGAME
 router.route('/livegame')
