@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -23,6 +24,8 @@ const app = express();
 app.enable('trust proxy');
 
 //GLOBAL MIDDLEWARES
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Implement CORS
 app.use(cors()); // Access-Control-Allow-Origin * ('*' means all the requests no matter where they are coming from)
 

@@ -19,7 +19,20 @@ const instantgameSchema = new mongooose.Schema({
         enum: ['online', 'friend']
     },
     winner: String,
-    Stats: Number
+    Stats: Number,
+    createdBy: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: [true, 'An instant game must be created by someone']
+    }
+});
+
+instantgameSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'createdBy',
+        select: 'username'
+    });
+    next();
 });
 
 const Instantgame = mongoose.model('Instantgame', instantgameSchema);
