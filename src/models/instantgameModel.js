@@ -1,31 +1,30 @@
 const mongoose = require('mongoose');
 
-const instantgameSchema = new mongooose.Schema({
+const instantgameSchema = new mongoose.Schema({
     categoryName: {
         type: String,
         required: [true, 'An instant game must have a category name'],
         lowercase: true
     },
-    player1: String,
-    player2: String,
+    players: [String],
     stake: {
         type: Number,
-        default: 5000
+        required: [true, 'An instant game must have a stake!']
     },
     questions: Array,
-    gameType: {
-        type: String,
-        lowercase: true,
-        enum: ['online', 'friend']
-    },
+    // gameType: {
+    //     type: String,
+    //     lowercase: true,
+    //     enum: ['online', 'friend']
+    // },
     winner: String,
     Stats: Number,
     createdBy: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: [true, 'An instant game must be created by someone']
     }
-});
+}, {timestamps: true});
 
 instantgameSchema.pre(/^find/, function(next) {
     this.populate({
