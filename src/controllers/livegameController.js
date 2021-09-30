@@ -395,7 +395,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     } else if (user.gameInit && currentTime >= +livegame.gameTime && currentTime < user.questionsTimer && livegame.activeStatus && !answer && !action && user.currentQuestion <= user.previousQuestion) {
         res.status(200).json({
             status: "success",
-            message: "Wait for next question!"
+            message: "Wait for next question!",
+            timer: user.questionsTimer
         });
     }
   

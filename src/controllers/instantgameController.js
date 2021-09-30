@@ -294,7 +294,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             user.gameInit = false;
         
             await user.save();
-            await instantGame.save();
+            // await instantGame.save();
         
             console.log("9");
             res.status(200).json({
