@@ -523,15 +523,15 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         user.earnings = user.earnings + moneyWon;
 
         //RESETTING THE USER STATE AND REMOVING THEM FROM THE LIVEGAME AFTER GAME HAS ENDED AND MONEY HAS BEEN SHARED
-        // user.currentQuestion = -1;
-        // user.previousQuestion = -1;
-        // user.gameEnded = false;
-        // user.gameInit = false;
-        // user.questionsTimer = 0;
-        // user.activeGames = [];
-        // user.currentGame = [];
-        // livegame.participants = [];
-        // livegame.activeParticipants = [];
+        user.currentQuestion = -1;
+        user.previousQuestion = -1;
+        user.gameEnded = false;
+        user.gameInit = false;
+        user.questionsTimer = 0;
+        user.activeGames = [];
+        user.currentGame = [];
+        livegame.participants = [];
+        livegame.activeParticipants = [];
     
         await user.save();
         await livegame.save();
