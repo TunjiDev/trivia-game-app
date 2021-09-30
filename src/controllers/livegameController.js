@@ -534,8 +534,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         livegame.participants.splice(userIndex1, 1);
         const userIndex2 = livegame.activeParticipants.indexOf(req.user._id);
         livegame.activeParticipants.splice(userIndex2, 1);
-        // livegame.participants = [];
-        // livegame.activeParticipants = [];
     
         await user.save();
         await livegame.save();
