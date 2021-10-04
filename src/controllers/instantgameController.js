@@ -138,7 +138,12 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         },
         {
             $match: {players: `${user.id}` }
-        }
+        },
+        // {
+        //     $merge: {
+        //         into: "Instantgame" //{db: "triviaDB", coll: "instantgames"}
+        //     }
+        // }
     ]);
 
     // console.log(instantGame[0].players);
@@ -163,7 +168,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("2. Game Initialized");
             // console.log(instantGame[0].questions);
             console.log(instantGame[0]);
-            // console.log(instantGame);
+            console.log(instantGame);
         }
         
         
@@ -181,8 +186,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
         
             console.log("4. Moved to Next question");
-            // console.log(instantGame[0].questions);
-            // console.log(instantGame);
+            console.log(instantGame[0].questions);
+            console.log(instantGame);
             
             res.status(200).json({
                 status: "success",
@@ -202,6 +207,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
         
             console.log("3. question returned");
+            console.log(instantGame[0].questions);
+            console.log(instantGame);
 
             res.status(200).json({
                 status: "success",
@@ -226,8 +233,11 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             //Remove user from game if they get the answer wrong
             if (answer !== instantGame[0].questions[user.currentQuestion].answer) {
                 const userIndex = instantGame[0].players.indexOf(user.id);
-                instantGame[0].players.splice(userIndex, 1);
-                await instantGame.save();
+                /*const spliced = */instantGame[0].players.splice(userIndex, 1);
+                // await instantGame.findOneAndUpdate({players: `${user.id}`}, {players: spliced}, {runValidators: true});
+                await instantGame[0].markModified('players');
+                await instantGame[0].save();
+                console.log(instantGame[0]);
             }
         
             console.log("5. Answer submitted");
@@ -264,7 +274,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             else if (user.extraLives > 0 && action === "extralife") {
                 if (!instantGame[0].players.includes(user.id)) {
                     instantGame[0].players.push(user.id);
-                    await instantGame.save();
+                    await instantGame[0].save();
                 }
                 user.extraLives = user.extraLives - 1;
         
