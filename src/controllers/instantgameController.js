@@ -6,8 +6,8 @@ const APIFeatures = require("../../utils/apiFeatures");
 const Question = require('../models/questionModel');
 
 exports.playInstantGame = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-    if (!req.body.createdBy) req.body.createdBy = user.id;
+    // const user = await User.findById(req.user._id);
+    if (!req.body.createdBy) req.body.createdBy = req.user._id;
   
     const fourEasyQuestions = await Question.aggregate([
         {
@@ -70,7 +70,7 @@ exports.playInstantGame = catchAsync(async (req, res, next) => {
                 createdBy: req.body.createdBy
             });
 
-            newInstantGame.players.push(user.id);
+            newInstantGame.players.push(req.user._id);
             await newInstantGame.save();
             
             res.status(200).json({
@@ -89,10 +89,10 @@ exports.playInstantGame = catchAsync(async (req, res, next) => {
             stake: req.body.stake
         });
 
-        if (availableInstantGame.players.includes(user.id)) {
+        if (availableInstantGame.players.includes(req.user._id)) {
             return next(new AppError('You cannot join your own game!', 400));
         } else {
-            availableInstantGame.players.push(user.id);
+            availableInstantGame.players.push(req.user._id);
             await availableInstantGame.save();
         }
                     
@@ -124,7 +124,9 @@ exports.getAllInstantGames = catchAsync(async (req, res, next) => {
 });
 
 exports.gameZone = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
+    const answer = req.body.answer;
+    const action = req.body.action;
     // const currentTime = Date.parse(new Date());
 
     // const instantgames = await Instantgame.find({ players: { $size: 2} });
@@ -135,7 +137,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             $match: {players: {$size: 2} }
         },
         {
-            $match: {players: `${req.user.id}` }
+            $match: {players: `${req.user._id}` }
         }
     ]);
 
@@ -175,11 +177,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
         
             console.log("4. Moved to Next question");
+            // console.log(instantGame[0].questions);
+            // console.log(instantGame[0]);
     
             res.status(200).json({
                 status: "success",
-                question: instantGame.questions[user.currentQuestion].question,
-                options: instantGame.questions[user.currentQuestion].options,
+                question: instantGame[0].questions[user.currentQuestion].question,
+                options: instantGame[0].questions[user.currentQuestion].options,
                 message: "Next Question."
             });
         }
@@ -195,8 +199,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
             res.status(200).json({
                 status: "success",
-                question: instantGame.questions[user.currentQuestion].question,
-                options: instantGame.questions[user.currentQuestion].options,
+                question: instantGame[0].questions[user.currentQuestion].question,
+                options: instantGame[0].questions[user.currentQuestion].options,
                 message: "Question has been returned"
             });
         } else if (user.gameInit && !answer && !action && user.currentQuestion <= user.previousQuestion) {
@@ -208,24 +212,28 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
         //SUBMITTING ANSWERS
         if (user.gameInit && answer && !action) {
-            if (!instantGame.players.includes(req.user._id)) {
-                return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+            if (!(instantGame[0].players.includes(req.user._id))) {
+                // return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+                console.log("You have failed a question and no longer a participant in this game");
             }
         
             //Remove user from game if they get the answer wrong
-            if (answer !== instantGame.questions[user.currentQuestion].answer) {
-                const userIndex = instantGame.players.indexOf(req.user._id);
-                instantGame.players.splice(userIndex, 1);
-                await instantGame.save();
+            if (answer !== instantGame[0].questions[user.currentQuestion].answer) {
+                const userIndex = instantGame[0].players.indexOf(req.user._id);
+                instantGame[0].players.splice(userIndex, 1);
+                await instantGame[0].save();
             }
         
             console.log("5. Answer submitted");
+            console.log(instantGame[0].players);
+            console.log(instantGame[0].players.includes(req.user._id));
+            console.log(typeof(req.user._id));
         
             res.status(200).json({
                 status: "success",
                 timer: user.questionsTimer,
                 message:
-                answer == instantGame.questions[user.currentQuestion].answer ? "Correct!" : "Wrong!",
+                answer == instantGame[0].questions[user.currentQuestion].answer ? "Correct!" : "Wrong!",
             });
         }
 
@@ -240,17 +248,17 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 console.log("6");
                 res.status(200).json({
                     status: "success",
-                    question: instantGame.questions[user.currentQuestion].question,
-                    options: instantGame.questions[user.currentQuestion].options,
-                    answer: instantGame.questions[user.currentQuestion].answer,
+                    question: instantGame[0].questions[user.currentQuestion].question,
+                    options: instantGame[0].questions[user.currentQuestion].options,
+                    answer: instantGame[0].questions[user.currentQuestion].answer,
                     message: "Question has been returned"
                 });
             }
             // Check if the user is using extra life
             else if (user.extraLives > 0 && action === "extralife") {
-                if (!instantGame.players.includes(req.user._id)) {
-                    instantGame.players.push(req.user._id);
-                    await instantGame.save();
+                if (!instantGame[0].players.includes(req.user._id)) {
+                    instantGame[0].players.push(req.user._id);
+                    await instantGame[0].save();
                 }
                 user.extraLives = user.extraLives - 1;
         
@@ -263,8 +271,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 console.log('extralife used');
                 res.status(200).json({
                     status: "success",
-                    question: instantGame.questions[user.currentQuestion].question,
-                    options: instantGame.questions[user.currentQuestion].options,
+                    question: instantGame[0].questions[user.currentQuestion].question,
+                    options: instantGame[0].questions[user.currentQuestion].options,
                     message: "You have used an extralife and have been taken to the next question"
                 });
             } else {
@@ -280,10 +288,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
         //SPLIT THE MONEY(REWARD IN THE instantGame MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
         if (user.gameEnded && !user.moneyWon && user.gameInit && !answer) {
-            if (!instantGame.players.includes(req.user._id)) {
+            if (!instantGame[0].players.includes(req.user._id)) {
                 return next(new AppError("You have failed a question and are no longer a participant in this game!", 400));
             }
-            const moneyWon = (instantGame.stake * 2) / instantGame.players.length;
+            const moneyWon = (instantGame[0].stake * 2) / instantGame[0].players.length;
         
             user.earnings = user.earnings + moneyWon;
 

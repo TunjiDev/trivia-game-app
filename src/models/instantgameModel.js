@@ -6,7 +6,7 @@ const instantgameSchema = new mongoose.Schema({
         required: [true, 'An instant game must have a category name'],
         lowercase: true
     },
-    players: [String],
+    players: [],
     stake: {
         type: Number,
         required: [true, 'An instant game must have a stake!']

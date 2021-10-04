@@ -36,7 +36,7 @@ router.route('/instantgame')
   .post(instantgameController.playInstantGame);
 
 router.route('/instantgame-zone')
-  .get(instantgameController.gameZone);
+  .post(instantgameController.gameZone);
 
 router.route('/logout').get(authController.logout);
 
