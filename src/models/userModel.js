@@ -74,6 +74,10 @@ const userSchema = new mongoose.Schema({
   gameEnded: {
       type: Boolean,
       default: false
+  },
+  firstQuestion: {
+    type: Boolean,
+    default: false
   }
 }, {timestamps: true});
 

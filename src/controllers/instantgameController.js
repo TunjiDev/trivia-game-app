@@ -163,26 +163,27 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("2. Game Initialized");
             // console.log(instantGame[0].questions);
             console.log(instantGame[0]);
-            console.log(instantGame);
+            // console.log(instantGame);
         }
-
+        
+        
         //MOVING TO THE NEXT QUESTION
-        if (user.gameInit && !answer && !action && !user.gameEnded) {
+        if (user.gameInit && !answer && !action && !user.gameEnded && user.firstQuestion) {
 
             user.currentQuestion = user.currentQuestion + 1;
-    
+            
             await user.save();
             
             if (user.currentQuestion > 8) {
                 user.gameEnded = true;
-        
+                
                 await user.save();
             }
         
             console.log("4. Moved to Next question");
             // console.log(instantGame[0].questions);
-            console.log(instantGame);
-    
+            // console.log(instantGame);
+            
             res.status(200).json({
                 status: "success",
                 question: instantGame[0].questions[user.currentQuestion].question,
@@ -190,11 +191,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 message: "Next Question."
             });
         }
-
+        
         //GET THE QUESTIONS
-        if (user.gameInit && !answer && !action && user.currentQuestion > user.previousQuestion) {
+        if (user.gameInit && !answer && !action && user.currentQuestion > user.previousQuestion && !user.firstQuestion) {
         
             user.previousQuestion = user.previousQuestion + 1;
+
+            user.firstQuestion = true;
         
             await user.save();
         
@@ -212,25 +215,25 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 message: "Wait for next question!"
             });
         }
-
+        
         //SUBMITTING ANSWERS
         if (user.gameInit && answer && !action) {
             if (!(instantGame[0].players.includes(user.id))) {
-                // return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
-                console.log("You have failed a question and no longer a participant in this game");
+                return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+                // console.log("You have failed a question and no longer a participant in this game");
             }
         
             //Remove user from game if they get the answer wrong
             if (answer !== instantGame[0].questions[user.currentQuestion].answer) {
                 const userIndex = instantGame[0].players.indexOf(user.id);
                 instantGame[0].players.splice(userIndex, 1);
-                await instantGame[0].save();
+                await instantGame.save();
             }
         
             console.log("5. Answer submitted");
-            console.log(instantGame[0].players);
-            console.log(instantGame[0].players.includes(user.id));
-            console.log(typeof(user.id));
+            // console.log(instantGame[0].players);
+            // console.log(instantGame[0].players.includes(user.id));
+            // console.log(typeof(user.id));
         
             res.status(200).json({
                 status: "success",
@@ -261,7 +264,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             else if (user.extraLives > 0 && action === "extralife") {
                 if (!instantGame[0].players.includes(user.id)) {
                     instantGame[0].players.push(user.id);
-                    await instantGame[0].save();
+                    await instantGame.save();
                 }
                 user.extraLives = user.extraLives - 1;
         
@@ -305,7 +308,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             user.gameInit = false;
         
             await user.save();
-            // await instantGame.save();
+            // await instantGame[0].save();
         
             console.log("9");
             res.status(200).json({
