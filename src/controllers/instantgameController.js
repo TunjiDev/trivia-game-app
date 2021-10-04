@@ -137,7 +137,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             $match: {players: {$size: 2} }
         },
         {
-            $match: {players: `${toString(req.user._id)}` }
+            $match: {players: `${user.id}` }
         }
     ]);
 
@@ -215,22 +215,22 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
         //SUBMITTING ANSWERS
         if (user.gameInit && answer && !action) {
-            if (!(instantGame[0].players.includes(req.user._id))) {
+            if (!(instantGame[0].players.includes(user.id))) {
                 // return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
                 console.log("You have failed a question and no longer a participant in this game");
             }
         
             //Remove user from game if they get the answer wrong
             if (answer !== instantGame[0].questions[user.currentQuestion].answer) {
-                const userIndex = instantGame[0].players.indexOf(req.user._id);
+                const userIndex = instantGame[0].players.indexOf(user.id);
                 instantGame[0].players.splice(userIndex, 1);
                 await instantGame[0].save();
             }
         
             console.log("5. Answer submitted");
             console.log(instantGame[0].players);
-            console.log(instantGame[0].players.includes(req.user._id));
-            console.log(typeof(req.user._id));
+            console.log(instantGame[0].players.includes(user.id));
+            console.log(typeof(user.id));
         
             res.status(200).json({
                 status: "success",
@@ -259,8 +259,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
             // Check if the user is using extra life
             else if (user.extraLives > 0 && action === "extralife") {
-                if (!instantGame[0].players.includes(req.user._id)) {
-                    instantGame[0].players.push(req.user._id);
+                if (!instantGame[0].players.includes(user.id)) {
+                    instantGame[0].players.push(user.id);
                     await instantGame[0].save();
                 }
                 user.extraLives = user.extraLives - 1;
@@ -291,7 +291,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
         //SPLIT THE MONEY(REWARD IN THE instantGame MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
         if (user.gameEnded && !user.moneyWon && user.gameInit && !answer) {
-            if (!instantGame[0].players.includes(req.user._id)) {
+            if (!instantGame[0].players.includes(user.id)) {
                 return next(new AppError("You have failed a question and are no longer a participant in this game!", 400));
             }
             const moneyWon = (instantGame[0].stake * 2) / instantGame[0].players.length;
