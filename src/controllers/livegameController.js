@@ -424,7 +424,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         if (answer !== livegame.questions[user.currentQuestion].answer) {
             const userIndex = livegame.activeParticipants.indexOf(req.user._id);
             livegame.activeParticipants.splice(userIndex, 1);
+            user.activeGames = [];
+
             await livegame.save();
+            await user.save();
         }
     
         console.log("5. Answer submitted");
@@ -477,7 +480,14 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         else if (user.extraLives > 0 && action === "extralife") {
             if (!livegame.activeParticipants.includes(req.user._id)) {
                 livegame.activeParticipants.push(req.user._id);
+                let objectForActiveGames = {
+                    categoryId: livegame._id,
+                    gameTime: livegame.gameTime,
+                };
+  
+                user.activeGames.push(objectForActiveGames);
                 await livegame.save();
+                await user.save();
             }
             user.extraLives = user.extraLives - 1;
     
