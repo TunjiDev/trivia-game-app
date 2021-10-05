@@ -93,6 +93,7 @@ exports.playInstantGame = catchAsync(async (req, res, next) => {
         if (availableInstantGame.players.includes(req.user._id)) {
             return next(new AppError('You cannot join your own game!', 400));
         } else {
+            availableInstantGame.players.push(req.user._id);
             availableInstantGame.activePlayers.push(req.user._id);
             await availableInstantGame.save();
         }
