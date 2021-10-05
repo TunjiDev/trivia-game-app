@@ -166,7 +166,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("2. Game Initialized");
             res.status(200).json({
                 status: "success",
-                message: "User Found!"
+                message: "User Found!",
+                user: user.id
             });
         }
         
