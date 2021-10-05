@@ -162,7 +162,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
     if (instantGame) {
         //INITIALIZING GAME
-        if (!user.gameInit) {
+        if (!user.gameInit && !user.gameEnded) {
             user.currentQuestion = 0;
     
             user.gameInit = true;
@@ -171,7 +171,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     
             console.log("2. Game Initialized");
             // console.log(instantGame[0].questions);
-            console.log(instantGame[0]);
+            // console.log(instantGame[0]);
             // console.log(instantGame);
         }
         
@@ -194,7 +194,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         
             console.log("4. Moved to Next question");
             // console.log(instantGame.questions);
-            console.log(instantGame[0]);
+            // console.log(instantGame[0]);
             
             res.status(200).json({
                 status: "success",
@@ -205,7 +205,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
         
         //GET THE QUESTIONS
-        if (user.gameInit && !answer && !action && user.currentQuestion > user.previousQuestion && !user.firstQuestion) {
+        if (user.gameInit && !answer && !action && user.currentQuestion > user.previousQuestion && !user.firstQuestion && !user.gameEnded) {
             if (!(instantGame[0].activePlayers.includes(user.id))) {
                 return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
             }
@@ -218,7 +218,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         
             console.log("3. question returned");
             // console.log(instantGame[0].questions);
-            console.log(instantGame[0]);
+            // console.log(instantGame[0]);
 
             res.status(200).json({
                 status: "success",
@@ -234,7 +234,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
         
         //SUBMITTING ANSWERS
-        if (user.gameInit && answer && !action) {
+        if (user.gameInit && answer && !action && !user.gameEnded) {
             if (!(instantGame[0].activePlayers.includes(user.id))) {
                 return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
             }
@@ -259,7 +259,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
 
         //IF EXTRALIFE OR ERASER IS BEING USED
-        if (user.gameInit && !answer && action) {
+        if (user.gameInit && !answer && action && !user.gameEnded) {
 
             // Check if it's eraser that's being used
             if (user.erasers > 0 && action === "eraser") {
@@ -308,7 +308,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         }
 
         //SPLIT THE MONEY(REWARD IN THE instantGame[0] MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
-        if (user.gameEnded && !user.moneyWon && user.gameInit && !answer) {
+        if (user.gameEnded && user.gameInit && !answer && user.currentQuestion > 8 && user.currentQuestion > user.previousQuestion) {
             if (!instantGame[0].activePlayers.includes(user.id)) {
                 return next(new AppError("You have failed a question and are no longer a participant in this game!", 400));
             }
@@ -317,10 +317,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             user.earnings = user.earnings + moneyWon;
 
             //RESETTING THE USER STATE AND REMOVING THEM FROM THE instantGame[0] AFTER GAME HAS ENDED AND MONEY HAS BEEN SHARED
-            user.currentQuestion = -1;
-            user.previousQuestion = -1;
-            user.gameEnded = false;
-            user.gameInit = false;
+            // user.currentQuestion = -1;
+            // user.previousQuestion = -1;
+            // user.gameEnded = false;
+            // user.gameInit = false;
         
             await user.save();
             // await instantGame[0].save();

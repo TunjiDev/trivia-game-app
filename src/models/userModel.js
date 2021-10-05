@@ -78,6 +78,10 @@ const userSchema = new mongoose.Schema({
   firstQuestion: {
     type: Boolean,
     default: false
+  },
+  coinsWon: {
+    type: Boolean,
+    default: false
   }
 }, {timestamps: true});
 
