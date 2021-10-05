@@ -149,7 +149,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     // CHECK ALL GAMES WHICH PLAYER'S ARRAY LENGTH IS EQUAL TO 2 AND THE PLAYER'S ID IS INSIDE THE ARRAY
     const instantGame = await Instantgame.find({
         $and: [
-            {  players: {$size: 2} },
+            { players: {$size: 2} },
             { players: user.id }
         ]
     });
@@ -164,6 +164,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
     
             console.log("2. Game Initialized");
+            res.status(200).json({
+                status: "success",
+                message: "User Found!"
+            });
         }
         
         
