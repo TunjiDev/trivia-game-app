@@ -71,6 +71,7 @@ exports.playInstantGame = catchAsync(async (req, res, next) => {
             });
 
             newInstantGame.players.push(req.user._id);
+            newInstantGame.activePlayers.push(req.user._id);
             await newInstantGame.save();
             
             res.status(200).json({
@@ -92,7 +93,7 @@ exports.playInstantGame = catchAsync(async (req, res, next) => {
         if (availableInstantGame.players.includes(req.user._id)) {
             return next(new AppError('You cannot join your own game!', 400));
         } else {
-            availableInstantGame.players.push(req.user._id);
+            availableInstantGame.activePlayers.push(req.user._id);
             await availableInstantGame.save();
         }
                     
@@ -127,26 +128,28 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.user._id);
     const answer = req.body.answer;
     const action = req.body.action;
-    // const currentTime = Date.parse(new Date());
 
     // const instantgames = await Instantgame.find({ players: { $size: 2} });
     // const instantGame = await Instantgame.find({ players: `${req.user.id}`});
-    // CHECK ALL GAMES WHICH PLAYER'S ARRAY LENGTH IS EQUAL TO 2 AND THE PLAYER'S ID IS INSIDE THE ARRAY
-    const instantGame = await Instantgame.aggregate([
-        {
-            $match: {players: {$size: 2} }
-        },
-        {
-            $match: {players: `${user.id}` }
-        },
-        // {
-        //     $merge: {
-        //         into: "Instantgame" //{db: "triviaDB", coll: "instantgames"}
-        //     }
-        // }
-    ]);
+    // const instantGame = await Instantgame.aggregate([
+    //     {
+        //         $match: {players: {$size: 2} }
+        //     },
+        //     {
+            //         $match: {players: `${user.id}` }
+            //     },
+            //     // {
+                //     //     $merge: {
+                    //     //         into: "Instantgame" //{db: "triviaDB", coll: "instantgames"}
+    //     //     }
+    //     // }
+    // ]);
 
-    // console.log(instantGame[0].players);
+    // CHECK ALL GAMES WHICH PLAYER'S ARRAY LENGTH IS EQUAL TO 2 AND THE PLAYER'S ID IS INSIDE THE ARRAY
+    const instantGame = await Instantgame.find({
+        players: { $gt: 1, $lt: 3 },
+        players: user.id
+    });
 
     // res.status(200).json({
     //     status: 'success',
@@ -168,12 +171,15 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("2. Game Initialized");
             // console.log(instantGame[0].questions);
             console.log(instantGame[0]);
-            console.log(instantGame);
+            // console.log(instantGame);
         }
         
         
         //MOVING TO THE NEXT QUESTION
         if (user.gameInit && !answer && !action && !user.gameEnded && user.firstQuestion) {
+            if (!(instantGame[0].activePlayers.includes(user.id))) {
+                return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+            }
 
             user.currentQuestion = user.currentQuestion + 1;
             
@@ -186,8 +192,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
         
             console.log("4. Moved to Next question");
-            console.log(instantGame[0].questions);
-            console.log(instantGame);
+            // console.log(instantGame.questions);
+            console.log(instantGame[0]);
             
             res.status(200).json({
                 status: "success",
@@ -199,6 +205,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         
         //GET THE QUESTIONS
         if (user.gameInit && !answer && !action && user.currentQuestion > user.previousQuestion && !user.firstQuestion) {
+            if (!(instantGame[0].activePlayers.includes(user.id))) {
+                return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
+            }
         
             user.previousQuestion = user.previousQuestion + 1;
 
@@ -207,8 +216,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
         
             console.log("3. question returned");
-            console.log(instantGame[0].questions);
-            console.log(instantGame);
+            // console.log(instantGame[0].questions);
+            console.log(instantGame[0]);
 
             res.status(200).json({
                 status: "success",
@@ -225,25 +234,20 @@ exports.gameZone = catchAsync(async (req, res, next) => {
         
         //SUBMITTING ANSWERS
         if (user.gameInit && answer && !action) {
-            if (!(instantGame[0].players.includes(user.id))) {
+            if (!(instantGame[0].activePlayers.includes(user.id))) {
                 return next(new AppError("You have failed a question and no longer a participant in this game!", 400));
-                // console.log("You have failed a question and no longer a participant in this game");
             }
         
             //Remove user from game if they get the answer wrong
             if (answer !== instantGame[0].questions[user.currentQuestion].answer) {
-                const userIndex = instantGame[0].players.indexOf(user.id);
-                /*const spliced = */instantGame[0].players.splice(userIndex, 1);
-                // await instantGame.findOneAndUpdate({players: `${user.id}`}, {players: spliced}, {runValidators: true});
-                await instantGame[0].markModified('players');
+                const userIndex = instantGame[0].activePlayers.indexOf(user.id);
+                instantGame[0].activePlayers.splice(userIndex, 1);
                 await instantGame[0].save();
-                console.log(instantGame[0]);
+                // console.log(instantGame[0]);
             }
         
             console.log("5. Answer submitted");
             // console.log(instantGame[0].players);
-            // console.log(instantGame[0].players.includes(user.id));
-            // console.log(typeof(user.id));
         
             res.status(200).json({
                 status: "success",
@@ -272,8 +276,8 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
             // Check if the user is using extra life
             else if (user.extraLives > 0 && action === "extralife") {
-                if (!instantGame[0].players.includes(user.id)) {
-                    instantGame[0].players.push(user.id);
+                if (!instantGame[0].activePlayers.includes(user.id)) {
+                    instantGame[0].activePlayers.push(user.id);
                     await instantGame[0].save();
                 }
                 user.extraLives = user.extraLives - 1;
@@ -302,16 +306,16 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("8");
         }
 
-        //SPLIT THE MONEY(REWARD IN THE instantGame MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
+        //SPLIT THE MONEY(REWARD IN THE instantGame[0] MODEL) AMONGST THE REMAINING ACTIVE PARTICIPANTS
         if (user.gameEnded && !user.moneyWon && user.gameInit && !answer) {
-            if (!instantGame[0].players.includes(user.id)) {
+            if (!instantGame[0].activePlayers.includes(user.id)) {
                 return next(new AppError("You have failed a question and are no longer a participant in this game!", 400));
             }
-            const moneyWon = (instantGame[0].stake * 2) / instantGame[0].players.length;
+            const moneyWon = (instantGame[0].stake * 2) / instantGame[0].activePlayers.length;
         
             user.earnings = user.earnings + moneyWon;
 
-            //RESETTING THE USER STATE AND REMOVING THEM FROM THE instantGame AFTER GAME HAS ENDED AND MONEY HAS BEEN SHARED
+            //RESETTING THE USER STATE AND REMOVING THEM FROM THE instantGame[0] AFTER GAME HAS ENDED AND MONEY HAS BEEN SHARED
             user.currentQuestion = -1;
             user.previousQuestion = -1;
             user.gameEnded = false;
@@ -323,7 +327,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("9");
             res.status(200).json({
                 status: "success",
-                message: `Congrats! You have won ₦${moneyWon} naira!`
+                message: `Congrats! You have won ₦${moneyWon} coins!!!`
             });
         }
     }
