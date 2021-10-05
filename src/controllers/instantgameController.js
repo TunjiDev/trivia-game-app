@@ -324,6 +324,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             });
         }
     } else {
-        return next(new AppError('No Instant Game found!', 400));
+        return next(new AppError('No player found yet...', 400));
     }
 });
