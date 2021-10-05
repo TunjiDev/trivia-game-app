@@ -148,19 +148,13 @@ exports.gameZone = catchAsync(async (req, res, next) => {
 
     // CHECK ALL GAMES WHICH PLAYER'S ARRAY LENGTH IS EQUAL TO 2 AND THE PLAYER'S ID IS INSIDE THE ARRAY
     const instantGame = await Instantgame.find({
-        players: { $gt: 1, $lt: 3 },
-        players: user.id
+        $and: [
+            {  players: {$size: 2} },
+            { players: user.id }
+        ]
     });
 
-    // res.status(200).json({
-    //     status: 'success',
-    //     results: instantGame.length,
-    //     data: {
-    //         instantGame
-    //     }
-    // });
-
-    if (instantGame) {
+    if (instantGame[0]) {
         //INITIALIZING GAME
         if (!user.gameInit && !user.gameEnded) {
             user.currentQuestion = 0;
@@ -170,9 +164,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
     
             console.log("2. Game Initialized");
-            // console.log(instantGame[0].questions);
-            // console.log(instantGame[0]);
-            // console.log(instantGame);
         }
         
         
@@ -250,9 +241,10 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             console.log("5. Answer submitted");
             // console.log(instantGame[0].players);
         
+            console.log(res.Body);
             res.status(200).json({
                 status: "success",
-                timer: user.questionsTimer,
+                // timer: user.questionsTimer,
                 message:
                 answer == instantGame[0].questions[user.currentQuestion].answer ? "Correct!" : "Wrong!",
             });
@@ -331,5 +323,7 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 message: `Congrats! You have won ₦${moneyWon} coins!!!`
             });
         }
+    } else {
+        return next(new AppError('No Instant Game found!', 400));
     }
 });

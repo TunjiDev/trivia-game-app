@@ -79,10 +79,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  coinsWon: {
+  /*coinsWon: {
     type: Boolean,
     default: false
-  }
+  }*/
 }, {timestamps: true});
 
 const User = mongoose.model('user', userSchema);
