@@ -162,8 +162,15 @@ exports.gameZone = catchAsync(async (req, res, next) => {
     
             user.gameInit = true;
     
+            user.previousQuestion = -1;
+            user.gameEnded = false;
+            user.userFound = false;
+            user.firstQuestion = false;
+            user.questionsTimer = 0;
+            user.activeGames = [];
+            user.currentGame = [];
+
             await user.save();
-    
             console.log("2. Game Initialized");
         }
 
@@ -198,8 +205,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             
         
             console.log("4. Moved to Next question");
-            // console.log(instantGame.questions);
-            // console.log(instantGame[0]);
             
             res.status(200).json({
                 status: "success",
@@ -222,8 +227,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             await user.save();
         
             console.log("3. question returned");
-            // console.log(instantGame[0].questions);
-            // console.log(instantGame[0]);
 
             res.status(200).json({
                 status: "success",
@@ -249,11 +252,9 @@ exports.gameZone = catchAsync(async (req, res, next) => {
                 const userIndex = instantGame[0].activePlayers.indexOf(user.id);
                 instantGame[0].activePlayers.splice(userIndex, 1);
                 await instantGame[0].save();
-                // console.log(instantGame[0]);
             }
         
             console.log("5. Answer submitted");
-            // console.log(instantGame[0].players);
         
             // console.log(res.Body);
             if (req.user.currentQuestion === 2) {
@@ -261,7 +262,6 @@ exports.gameZone = catchAsync(async (req, res, next) => {
             }
             res.status(200).json({
                 status: "success",
-                // timer: user.questionsTimer,
                 message:
                 answer == instantGame[0].questions[user.currentQuestion].answer ? "Correct!" : "Wrong!",
             });
