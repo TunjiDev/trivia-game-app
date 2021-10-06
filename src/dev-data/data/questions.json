@@ -1,0 +1,527 @@
+[
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6128aab80fcb940fac1f2287",
+        "question": "a peoplehard or a testhard45",
+        "options": [
+            {
+                "_id": "6128aab80fcb940fac1f2288",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "hard",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T09:04:56.259Z",
+        "updatedAt": "2021-08-27T09:04:56.259Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6128a371aa87511f70b9663a",
+        "question": "a peope222 or a testwe45",
+        "options": [
+            {
+                "_id": "6128a371aa87511f70b9663b",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "animes",
+        "difficulty": "hard",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:33:53.345Z",
+        "updatedAt": "2021-08-27T08:33:53.345Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6128a364aa87511f70b96636",
+        "question": "a people5222 or a testwe425",
+        "options": [
+            {
+                "_id": "6128a364aa87511f70b96637",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "animes",
+        "difficulty": "hard",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:33:40.966Z",
+        "updatedAt": "2021-08-27T08:33:40.966Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6128a344aa87511f70b96632",
+        "question": "a people5231222 or a test73we425",
+        "options": [
+            {
+                "_id": "6128a344aa87511f70b96633",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "average",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:33:08.014Z",
+        "updatedAt": "2021-08-27T08:33:08.014Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6128a325aa87511f70b9662e",
+        "question": "a people51222 or a test73425",
+        "options": [
+            {
+                "_id": "6128a325aa87511f70b9662f",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "average",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:32:37.535Z",
+        "updatedAt": "2021-08-27T08:32:37.535Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f860a9e7f0e50ece003",
+        "question": "a people5122 or a test7345",
+        "options": [
+            {
+                "_id": "61289f860a9e7f0e50ece004",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "hard",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:17:10.880Z",
+        "updatedAt": "2021-08-27T08:17:10.880Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f7f0a9e7f0e50ecdfff",
+        "question": "a people512 or a test734",
+        "options": [
+            {
+                "_id": "61289f7f0a9e7f0e50ece000",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "average",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:17:03.306Z",
+        "updatedAt": "2021-08-27T08:17:03.306Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f760a9e7f0e50ecdffb",
+        "question": "a people51 or a test71",
+        "options": [
+            {
+                "_id": "61289f760a9e7f0e50ecdffc",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "animes",
+        "difficulty": "average",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:16:54.459Z",
+        "updatedAt": "2021-08-27T08:16:54.459Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f5b0a9e7f0e50ecdff3",
+        "question": "a people21 or a test21",
+        "options": [
+            {
+                "_id": "61289f5b0a9e7f0e50ecdff4",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "average",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:16:27.379Z",
+        "updatedAt": "2021-08-27T08:16:27.379Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f4f0a9e7f0e50ecdfef",
+        "question": "a people3 or a test3",
+        "options": [
+            {
+                "_id": "61289f4f0a9e7f0e50ecdff0",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "animes",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:16:15.191Z",
+        "updatedAt": "2021-08-27T08:16:15.191Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f450a9e7f0e50ecdfeb",
+        "question": "a people4 or a test4",
+        "options": [
+            {
+                "_id": "61289f450a9e7f0e50ecdfec",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:16:05.731Z",
+        "updatedAt": "2021-08-27T08:16:05.731Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289f070a9e7f0e50ecdfe4",
+        "question": "a boy4 or a girl4",
+        "options": [
+            {
+                "_id": "61289f070a9e7f0e50ecdfe5",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "hard",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:15:03.330Z",
+        "updatedAt": "2021-08-27T08:15:03.330Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289efe0a9e7f0e50ecdfe0",
+        "question": "a boy3 or a girl3",
+        "options": [
+            {
+                "_id": "61289efe0a9e7f0e50ecdfe1",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "animes",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:14:54.583Z",
+        "updatedAt": "2021-08-27T08:14:54.583Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289ef60a9e7f0e50ecdfdc",
+        "question": "a boy2 or a girl2",
+        "options": [
+            {
+                "_id": "61289ef60a9e7f0e50ecdfdd",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:14:46.187Z",
+        "updatedAt": "2021-08-27T08:14:46.187Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289e9c0a9e7f0e50ecdfd5",
+        "question": "a boy or a girl",
+        "options": [
+            {
+                "_id": "61289e9c0a9e7f0e50ecdfd6",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "people"
+            }
+        ],
+        "answer": "Test 100",
+        "category": "new category",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:13:16.541Z",
+        "updatedAt": "2021-08-27T08:13:16.541Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289dda0a9e7f0e50ecdfca",
+        "question": "In what episode of fairytail does natsu dragneel defeat the twin dragons?",
+        "category": "animes",
+        "options": [
+            {
+                "_id": "61289dda0a9e7f0e50ecdfcb",
+                "optionA": "Episode 50",
+                "optionB": "Episode 75",
+                "optionC": "Episode 175"
+            }
+        ],
+        "answer": "Episode 175",
+        "difficulty": "easy",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:10:02.719Z",
+        "updatedAt": "2021-08-27T08:10:02.719Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289d360a9e7f0e50ecdfc6",
+        "question": "NewTest 7, Newtest 8 or NewTest 9?",
+        "options": [
+            {
+                "_id": "61289d360a9e7f0e50ecdfc7",
+                "optionA": "NewTest 7",
+                "optionB": "NewTest 8",
+                "optionC": "NewTest 9"
+            }
+        ],
+        "answer": "NewTest 7",
+        "difficulty": "hard",
+        "category": "animes",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:07:18.734Z",
+        "updatedAt": "2021-08-27T08:07:18.734Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289d070a9e7f0e50ecdfbe",
+        "question": "NewTest 4, Newtest 5 or NewTest 6?",
+        "options": [
+            {
+                "_id": "61289d070a9e7f0e50ecdfbf",
+                "optionA": "NewTest 4",
+                "optionB": "NewTest 5",
+                "optionC": "NewTest 6"
+            }
+        ],
+        "answer": "NewTest 4",
+        "difficulty": "hard",
+        "category": "new category",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T08:06:31.364Z",
+        "updatedAt": "2021-08-27T08:06:31.364Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "61289a48c96fe5043074227f",
+        "question": "NewTest 1, Newtest 2 or NewTest 3?",
+        "options": [
+            {
+                "_id": "61289a48c96fe50430742280",
+                "optionA": "NewTest 1",
+                "optionB": "NewTest 2",
+                "optionC": "NewTest 3"
+            }
+        ],
+        "answer": "NewTest 1",
+        "difficulty": "hard",
+        "category": "new category",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-27T07:54:48.927Z",
+        "updatedAt": "2021-08-27T07:54:48.927Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "6127583ab45e9600164bc895",
+        "question": "okay one more",
+        "options": [
+            {
+                "_id": "6127583ab45e9600164bc896",
+                "optionA": "lol",
+                "optionB": "why",
+                "optionC": "funny"
+            }
+        ],
+        "answer": "why",
+        "difficulty": "easy",
+        "category": "animes",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-26T09:00:42.097Z",
+        "updatedAt": "2021-08-26T09:00:42.097Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "612757adb45e9600164bc87c",
+        "question": "I'm tired of writing questions",
+        "options": [
+            {
+                "_id": "612757c7b45e9600164bc886",
+                "optionA": "lol",
+                "optionB": "hahaha",
+                "optionC": "seriously"
+            }
+        ],
+        "answer": "lol",
+        "difficulty": "average",
+        "category": "animes",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-26T08:58:21.714Z",
+        "updatedAt": "2021-08-26T08:58:47.875Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "612756cfb45e9600164bc878",
+        "question": "test",
+        "options": [
+            {
+                "_id": "612756cfb45e9600164bc879",
+                "optionA": "people",
+                "optionB": "Test 100",
+                "optionC": "children and joy"
+            }
+        ],
+        "answer": "Test 100",
+        "difficulty": "hard",
+        "category": "animes",
+        "submitttedBy": "6126583d2c03db00162f0f4e",
+        "createdAt": "2021-08-26T08:54:39.531Z",
+        "updatedAt": "2021-08-26T08:54:39.531Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "612633942c03db00162f0e5d",
+        "question": "What is my favorite food?",
+        "options": [
+            {
+                "_id": "612633942c03db00162f0e5e",
+                "optionA": "egg",
+                "optionB": "yam",
+                "optionC": "rice"
+            }
+        ],
+        "answer": "yam",
+        "difficulty": "hard",
+        "category": "animes",
+        "submitttedBy": "6124b321309fa400165e0684",
+        "createdAt": "2021-08-25T12:12:04.664Z",
+        "updatedAt": "2021-08-25T12:12:04.664Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "612615262c03db00162f0d60",
+        "question": "one more to make it eleven",
+        "options": [
+            {
+                "_id": "61261b5c2c03db00162f0db5",
+                "optionA": "coke",
+                "optionB": "jgxcujgds",
+                "optionC": "juudtgufg"
+            }
+        ],
+        "answer": "coke",
+        "difficulty": "average",
+        "category": "animes",
+        "submitttedBy": "6124b321309fa400165e0684",
+        "createdAt": "2021-08-25T10:02:14.526Z",
+        "updatedAt": "2021-08-25T10:28:44.350Z",
+        "__v": 0
+    },
+    {
+        "playCount": 0,
+        "active": true,
+        "_id": "612614352c03db00162f0d30",
+        "question": "animes or murder series?",
+        "options": [
+            {
+                "_id": "612614352c03db00162f0d31",
+                "optionA": "animes",
+                "optionB": "murder series",
+                "optionC": "comedy"
+            }
+        ],
+        "answer": "comedy",
+        "difficulty": "easy",
+        "category": "animes",
+        "submitttedBy": "6124b321309fa400165e0684",
+        "createdAt": "2021-08-25T09:58:13.811Z",
+        "updatedAt": "2021-08-25T09:58:13.811Z",
+        "__v": 0
+    }
+]
